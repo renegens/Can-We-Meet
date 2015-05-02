@@ -1,38 +1,26 @@
 package gepalcreations.canwemeet;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
+
+    int[] timeZonePics =
+            {R.mipmap.time24h1, R.mipmap.time24h2, R.mipmap.time24h3, R.mipmap.time24h4, R.mipmap.time24h5, R.mipmap.time24h5,
+             R.mipmap.time24h6, R.mipmap.time24h7, R.mipmap.time24h8,R.mipmap.time24h9,R.mipmap.time24h10, R.mipmap.time24h11,
+             R.mipmap.time24h12, R.mipmap.time24h13, R.mipmap.time24h14, R.mipmap.time24h15, R.mipmap.time24h16, R.mipmap.time24h17,
+             R.mipmap.time24h18, R.mipmap.time24h19, R.mipmap.time24h20, R.mipmap.time24h21, R.mipmap.time24h22, R.mipmap.time24h23,
+             R.mipmap.time24h24};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
