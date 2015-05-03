@@ -17,16 +17,11 @@ import java.util.TimeZone;
 
 
 public class MainActivity extends Activity {
-    /*
-        int[] timeZonePics =
-                {R.mipmap.time24h1, R.mipmap.time24h2, R.mipmap.time24h3, R.mipmap.time24h4, R.mipmap.time24h5, R.mipmap.time24h5,
-                        R.mipmap.time24h6, R.mipmap.time24h7, R.mipmap.time24h8, R.mipmap.time24h9, R.mipmap.time24h10, R.mipmap.time24h11,
-                        R.mipmap.time24h12, R.mipmap.time24h13, R.mipmap.time24h14, R.mipmap.time24h15, R.mipmap.time24h16, R.mipmap.time24h17,
-                        R.mipmap.time24h18, R.mipmap.time24h19, R.mipmap.time24h20, R.mipmap.time24h21, R.mipmap.time24h22, R.mipmap.time24h23,
-                        R.mipmap.time24h24};*/
+
     private LinearLayout timeLinearLayout;
     private Calendar current;
-private static final String TAG = "TimeZone";
+    private static final String TAG = "TimeZone";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,22 +29,30 @@ private static final String TAG = "TimeZone";
 
         timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
+        //getting current timeZone from system
+        int timeZone = getTimeZone();
+        //checking if we are in the same time zone to do other logic.
+        int timeZoneCheck = compareSameTimeZone(timeZone);
+        if (timeZoneCheck==1){
+            timeZone=0;
+        }
 
-        loadImages();
+        Log.e(TAG, String.valueOf(getTimeZone()));
+        loadImages(timeZone);
     }
 
     ViewHolder holder;
 
-    public void loadImages() {
+    public void loadImages(int timeZone) {
 
-
-        current = Calendar.getInstance();
-
-        TimeZone tzCurrent = current.getTimeZone();
-        int timeZone = tzCurrent.getRawOffset();
         String imageName = null;
         int j = 1;
         boolean startAgain = false;
+
+        //checking and correcting for negative value
+        if (timeZone < 0 ){
+            timeZone=timeZone*(-1);
+        }
 
         for (int i = timeZone + 1; i < 25 + timeZone; i++) {
             if (i < 25 && !startAgain) {
@@ -96,8 +99,32 @@ private static final String TAG = "TimeZone";
             }
         }
 
-       Log.v(TAG, String.valueOf(timeZone));
 
+
+    }
+    //Getting Local time zone from system
+    private int getTimeZone() {
+        current = Calendar.getInstance();
+
+        TimeZone tzCurrent = current.getTimeZone();
+        return tzCurrent.getRawOffset()/ (60 * 60 * 1000);
+
+    }
+    //Method to check if we are in the same time zone as entered by user. If yes then passing the 0 index to the array so
+    //it will display the same image.
+    private int compareSameTimeZone(int timeZone) {
+
+        Calendar current = Calendar.getInstance();
+
+        TimeZone tzCurrent = current.getTimeZone();
+        int time  = tzCurrent.getRawOffset()/ (60 * 60 * 1000);
+
+        if (timeZone != time){
+
+            return timeZone; //not in the same time zone
+        }
+        int timeZoneIsSame = 1;
+        return timeZoneIsSame; //in same time zone
     }
 
 
