@@ -26,9 +26,10 @@ public class MainActivity extends Activity {
     private LinearLayout timeLinearLayout;
     private Calendar current;
     private View line;
+    Context context = this;
 
 
-
+    private static final int hoursPerDt = 20;
     private static final String TAG = "TimeZone";
 
     @Override
@@ -44,15 +45,15 @@ public class MainActivity extends Activity {
         Log.e(TAG, String.valueOf(currentMinutes));
 
 
-
         //Loading Layout
         timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
         line = (View) findViewById(R.id.line);
+        
+        int timeCalculation = getTimeCalculation(currentMinutes, currentHours);
 
-        //Calculate time for line animation
-        int timeCalculation = currentHours*60+currentMinutes;
+
         line.setTranslationY(timeCalculation);
         
         //getting current timeZone from system
@@ -65,6 +66,19 @@ public class MainActivity extends Activity {
 
         Log.e(TAG, String.valueOf(getTimeZone()));
         loadImages(timeZone);
+    }
+
+    private int getTimeCalculation(int currentMinutes, int currentHours) {
+        //Calculate time for line animation
+        float screenDensity = getResources().getDisplayMetrics().density;
+        Log.e("ScreenSize", String.valueOf(screenDensity));
+
+
+        float fTimeCalculation = (currentHours*hoursPerDt*screenDensity+currentMinutes);
+        int timeCalculation = (int) fTimeCalculation;
+
+        Log.e("TimeCalculation",String.valueOf(timeCalculation));
+        return timeCalculation;
     }
 
     ViewHolder holder;
@@ -179,6 +193,11 @@ public class MainActivity extends Activity {
         }
         int timeZoneIsSame = 1;
         return timeZoneIsSame; //in same time zone
+    }
+
+    public static int dpToPixels(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
     }
 
 

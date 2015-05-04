@@ -6,7 +6,7 @@
     <ImageView
         android:id="@+id/time_image"
         android:layout_width="match_parent"
-        android:layout_height="21.2dp"
+        android:layout_height="20dp"
         android:scaleType="fitXY" />
 
 </RelativeLayout>
