@@ -1,8 +1,12 @@
 package gepalcreations.canwemeet;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +14,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -62,6 +69,7 @@ public class MainActivity extends Activity {
 
     ViewHolder holder;
 
+
     public void loadImages(int timeZone) {
 
         String imageName = null;
@@ -69,11 +77,12 @@ public class MainActivity extends Activity {
         boolean startAgain = false;
 
         //checking and correcting for negative value
-        if (timeZone < 0 ){
-            timeZone=timeZone*(-1);
+        if (timeZone < 0) {
+            timeZone = timeZone * (-1);
         }
 
         for (int i = timeZone + 1; i < 25 + timeZone; i++) {
+
             if (i < 25 && !startAgain) {
                 LayoutInflater inflater = getLayoutInflater();
                 View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
@@ -82,11 +91,20 @@ public class MainActivity extends Activity {
                 holder.image = (ImageView) v.findViewById(R.id.time_image);
 
                 imageName = "time24h" + i;
-                int resourceId = getResources().getIdentifier(imageName, "drawable", getPackageName());
 
-                Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), resourceId);
 
-                holder.image.setImageBitmap(bitmap);
+                //int resourceId = getResources().getIdentifier(imageName, "drawable", getPackageName());
+
+                //Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), resourceId);
+
+                //holder.image.setImageBitmap(bitmap);
+
+                try {
+                    holder.image.setImageDrawable(getAssetImage(this, imageName));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
 
                 v.setTag(holder);
 
@@ -99,11 +117,19 @@ public class MainActivity extends Activity {
                 holder.image = (ImageView) v.findViewById(R.id.time_image);
 
                 imageName = "time24h" + j;
-                int resourceId = getResources().getIdentifier(imageName, "drawable", getPackageName());
 
-                Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), resourceId);
 
-                holder.image.setImageBitmap(bitmap);
+                //int resourceId = getResources().getIdentifier(imageName, "drawable", getPackageName());
+
+                //Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), resourceId);
+
+                //holder.image.setImageBitmap(bitmap);
+
+                try {
+                    holder.image.setImageDrawable(getAssetImage(this, imageName));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 v.setTag(holder);
 
@@ -116,11 +142,20 @@ public class MainActivity extends Activity {
                 j = 1;
                 startAgain = true;
             }
+
         }
 
 
-
     }
+
+
+    public static Drawable getAssetImage(Context context, String filename) throws IOException {
+        AssetManager assets = context.getResources().getAssets();
+        InputStream buffer = new BufferedInputStream((assets.open("drawable/" + filename + ".jpeg")));
+        Bitmap bitmap = BitmapFactory.decodeStream(buffer);
+        return new BitmapDrawable(context.getResources(), bitmap);
+    }
+
     //Getting Local time zone from system
     private int getTimeZone() {
         current = Calendar.getInstance();
