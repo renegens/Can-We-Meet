@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 
         //Getting time from clock animation class in minutes
         Clock mClock = new Clock();
-        int currentMinutes = mClock.getSeconds();
+        int currentMinutes = mClock.getMinutes();
         int currentHours = mClock.getHours();
         Log.e(TAG, String.valueOf(currentHours));
         Log.e(TAG, String.valueOf(currentMinutes));
@@ -50,11 +50,11 @@ public class MainActivity extends Activity {
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
         line = (View) findViewById(R.id.line);
-        line.setTranslationY(800);
 
-
-
-
+        //Calculate time for line animation
+        int timeCalculation = currentHours*60+currentMinutes;
+        line.setTranslationY(timeCalculation);
+        
         //getting current timeZone from system
         int timeZone = getTimeZone();
         //checking if we are in the same time zone to do other logic.

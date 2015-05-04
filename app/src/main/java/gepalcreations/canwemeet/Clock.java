@@ -8,7 +8,7 @@ public class Clock {
     Calendar c = Calendar.getInstance();
 
 
-    public int getSeconds() {
+    public int getMinutes() {
         int minute = c.get(Calendar.MINUTE);
         return minute;
     }
