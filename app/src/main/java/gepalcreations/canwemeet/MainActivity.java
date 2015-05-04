@@ -1,20 +1,12 @@
 package gepalcreations.canwemeet;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Point;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -24,9 +16,12 @@ import java.util.TimeZone;
 
 public class MainActivity extends Activity {
 
-    private Context mContext;
     private LinearLayout timeLinearLayout;
     private Calendar current;
+    private View line;
+
+
+
     private static final String TAG = "TimeZone";
 
     @Override
@@ -35,23 +30,22 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         //Getting time from clock animation class in minutes
-        ClockAnimation mClockAnimation = new ClockAnimation();
-        int timeInMinutes = mClockAnimation.getSeconds();
+        Clock mClock = new Clock();
+        int currentMinutes = mClock.getSeconds();
+        int currentHours = mClock.getHours();
+        Log.e(TAG, String.valueOf(currentHours));
+        Log.e(TAG, String.valueOf(currentMinutes));
+
+
 
         //Loading Layout
         timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
+        //Loading Line
+        line = (View) findViewById(R.id.line);
+        line.setTranslationY(800);
 
-        //Getting height and witdh of layout
-        Display display = getWindowManager().getDefaultDisplay();
 
-        Point size = new Point();
-        display.getSize(size);
-        int width = size.x;
-        int height = size.y;
-        Paint mPaint = new Paint();
-
-        mClockAnimation.drawLine(size,width,height,mPaint);
 
 
         //getting current timeZone from system
