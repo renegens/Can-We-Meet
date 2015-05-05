@@ -92,22 +92,25 @@ public class MainActivity extends Activity {
             timeZone = timeZone * (-1);
         }
 
-        for (int i = 0; i <= 24; i++) {
-            int indexOfFiles = (i + timeZone) % 24;
+        for (int i = 0; i < 25; i++) {
+            int indexOfFiles = (i + timeZone) % 25;
             LayoutInflater inflater = getLayoutInflater();
             View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
             holder = new ViewHolder();
             holder.image = (ImageView) v.findViewById(R.id.time_image);
-            imageName = "time24h" + indexOfFiles;
 
-            try {
-                holder.image.setImageDrawable(getAssetImage(this, imageName));
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (indexOfFiles != 0) {
+                imageName = "time24h" + indexOfFiles;
+
+
+                try {
+                    holder.image.setImageDrawable(getAssetImage(this, imageName));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                v.setTag(holder);
+                timeLinearLayout.addView(v);
             }
-            v.setTag(holder);
-            timeLinearLayout.addView(v);
-
             Log.e("index is", String.valueOf(i));
             Log.e("index of file", String.valueOf(indexOfFiles));
         }
