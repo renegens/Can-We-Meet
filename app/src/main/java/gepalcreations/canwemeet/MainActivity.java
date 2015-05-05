@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
     Context context = this;
 
 
-    private static final int hoursPerDt = 20;
+    private static final int hoursPerDp = 20;
     private static final String TAG = "TimeZone";
 
     @Override
@@ -52,23 +52,18 @@ public class MainActivity extends Activity {
         line = (View) findViewById(R.id.line);
 
         int timeCalculation = getTimeCalculation(currentMinutes, currentHours);
-
-
-        //line.setTranslationY(timeCalculation);
-        line.setTranslationY(findTime(currentHours));
+        line.setTranslationY(timeCalculation);
 
         //getting current timeZone from system
         int timeZone = getTimeZone();
         //checking if we are in the same time zone to do other logic.
         int timeZoneCheck = compareSameTimeZone(timeZone);
-        if (timeZoneCheck == 1) {
-            timeZone = 0;
-        }
+        //if (timeZoneCheck == 1) {
+        //    timeZone = 0;
+        //}
 
-
-        int timeDifference = 6;
         Log.e(TAG, String.valueOf(getTimeZone()));
-        loadImages(timeZone + timeDifference);
+        loadImages(timeZone);
     }
 
     private int getTimeCalculation(int currentMinutes, int currentHours) {
@@ -77,7 +72,7 @@ public class MainActivity extends Activity {
         Log.e("ScreenSize", String.valueOf(screenDensity));
 
 
-        float fTimeCalculation = (currentHours * hoursPerDt * screenDensity + currentMinutes);
+        float fTimeCalculation = (currentHours * hoursPerDp * screenDensity + currentMinutes);
         int timeCalculation = (int) fTimeCalculation;
 
         Log.e("TimeCalculation", String.valueOf(timeCalculation));
@@ -90,15 +85,15 @@ public class MainActivity extends Activity {
     public void loadImages(int timeZone) {
 
         String imageName = "";
-        boolean startAgain = false;
+        //boolean startAgain = false;
 
         //checking and correcting for negative value
         if (timeZone < 0) {
             timeZone = timeZone * (-1);
         }
 
-        for (int i = 0; i < 48; i++) {
-            int indexOfFiles = (i + timeZone) % 48;
+        for (int i = 0; i <= 24; i++) {
+            int indexOfFiles = (i + timeZone) % 24;
             LayoutInflater inflater = getLayoutInflater();
             View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
             holder = new ViewHolder();
@@ -114,7 +109,7 @@ public class MainActivity extends Activity {
             timeLinearLayout.addView(v);
 
             Log.e("index is", String.valueOf(i));
-            Log.e("sum is", String.valueOf(indexOfFiles));
+            Log.e("index of file", String.valueOf(indexOfFiles));
         }
 
     }
@@ -156,64 +151,6 @@ public class MainActivity extends Activity {
     public static int dpToPixels(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
-    }
-
-
-    public int findTime(int time) {
-        int defaultNumber = 85;
-        int timeToAdd = 60;
-        switch (time) {
-            case 1:
-                return 25;
-            case 2:
-                return defaultNumber;
-            case 3:
-                return defaultNumber + timeToAdd;
-            case 4:
-                return defaultNumber + timeToAdd * 2;
-            case 5:
-                return defaultNumber + timeToAdd * 3;
-            case 6:
-                return defaultNumber + timeToAdd * 4;
-            case 7:
-                return defaultNumber + timeToAdd * 5;
-            case 8:
-                return defaultNumber + timeToAdd * 6;
-            case 9:
-                return defaultNumber + timeToAdd * 7;
-            case 10:
-                return defaultNumber + timeToAdd * 8;
-            case 11:
-                return defaultNumber + timeToAdd * 9;
-            case 12:
-                return defaultNumber + timeToAdd * 10;
-            case 13:
-                return defaultNumber + timeToAdd * 11;
-            case 14:
-                return defaultNumber + timeToAdd * 12;
-            case 15:
-                return defaultNumber + timeToAdd * 13;
-            case 16:
-                return defaultNumber + timeToAdd * 14;
-            case 17:
-                return defaultNumber + timeToAdd * 15;
-            case 18:
-                return defaultNumber + timeToAdd * 16;
-            case 19:
-                return defaultNumber + timeToAdd * 17;
-            case 20:
-                return defaultNumber + timeToAdd * 18;
-            case 21:
-                return defaultNumber + timeToAdd * 19;
-            case 22:
-                return defaultNumber + timeToAdd * 20;
-            case 23:
-                return defaultNumber + timeToAdd * 21;
-            case 24:
-                return defaultNumber + timeToAdd * 22;
-
-        }
-        return 0;
     }
 
     private class ViewHolder {
