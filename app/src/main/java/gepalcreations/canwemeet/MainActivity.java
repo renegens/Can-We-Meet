@@ -50,22 +50,25 @@ public class MainActivity extends Activity {
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
         line = (View) findViewById(R.id.line);
-        
+
         int timeCalculation = getTimeCalculation(currentMinutes, currentHours);
 
 
-        line.setTranslationY(timeCalculation);
-        
+        //line.setTranslationY(timeCalculation);
+        line.setTranslationY(findTime(currentHours));
+
         //getting current timeZone from system
         int timeZone = getTimeZone();
         //checking if we are in the same time zone to do other logic.
         int timeZoneCheck = compareSameTimeZone(timeZone);
-        if (timeZoneCheck==1){
-            timeZone=0;
+        if (timeZoneCheck == 1) {
+            timeZone = 0;
         }
 
+
+        int timeDifference = 6;
         Log.e(TAG, String.valueOf(getTimeZone()));
-        loadImages(timeZone);
+        loadImages(timeZone + timeDifference);
     }
 
     private int getTimeCalculation(int currentMinutes, int currentHours) {
@@ -74,10 +77,10 @@ public class MainActivity extends Activity {
         Log.e("ScreenSize", String.valueOf(screenDensity));
 
 
-        float fTimeCalculation = (currentHours*hoursPerDt*screenDensity+currentMinutes);
+        float fTimeCalculation = (currentHours * hoursPerDt * screenDensity + currentMinutes);
         int timeCalculation = (int) fTimeCalculation;
 
-        Log.e("TimeCalculation",String.valueOf(timeCalculation));
+        Log.e("TimeCalculation", String.valueOf(timeCalculation));
         return timeCalculation;
     }
 
@@ -86,8 +89,7 @@ public class MainActivity extends Activity {
 
     public void loadImages(int timeZone) {
 
-        String imageName = null;
-        int j = 1;
+        String imageName = "";
         boolean startAgain = false;
 
         //checking and correcting for negative value
@@ -95,70 +97,25 @@ public class MainActivity extends Activity {
             timeZone = timeZone * (-1);
         }
 
-        for (int i = timeZone + 1; i < 25 + timeZone; i++) {
+        for (int i = 0; i < 48; i++) {
+            int indexOfFiles = (i + timeZone) % 48;
+            LayoutInflater inflater = getLayoutInflater();
+            View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
+            holder = new ViewHolder();
+            holder.image = (ImageView) v.findViewById(R.id.time_image);
+            imageName = "time24h" + indexOfFiles;
 
-            if (i < 25 && !startAgain) {
-                LayoutInflater inflater = getLayoutInflater();
-                View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
-                holder = new ViewHolder();
-
-                holder.image = (ImageView) v.findViewById(R.id.time_image);
-
-                imageName = "time24h" + i;
-
-
-                //int resourceId = getResources().getIdentifier(imageName, "drawable", getPackageName());
-
-                //Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), resourceId);
-
-                //holder.image.setImageBitmap(bitmap);
-
-                try {
-                    holder.image.setImageDrawable(getAssetImage(this, imageName));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-                v.setTag(holder);
-
-                timeLinearLayout.addView(v);
-            } else {
-                LayoutInflater inflater = getLayoutInflater();
-                View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
-                holder = new ViewHolder();
-
-                holder.image = (ImageView) v.findViewById(R.id.time_image);
-
-                imageName = "time24h" + j;
-
-
-                //int resourceId = getResources().getIdentifier(imageName, "drawable", getPackageName());
-
-                //Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), resourceId);
-
-                //holder.image.setImageBitmap(bitmap);
-
-                try {
-                    holder.image.setImageDrawable(getAssetImage(this, imageName));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                v.setTag(holder);
-
-                timeLinearLayout.addView(v);
-
-                j++;
+            try {
+                holder.image.setImageDrawable(getAssetImage(this, imageName));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            v.setTag(holder);
+            timeLinearLayout.addView(v);
 
-            if (imageName.equals("time24h24")) {
-                j = 1;
-                startAgain = true;
-            }
-
+            Log.e("index is", String.valueOf(i));
+            Log.e("sum is", String.valueOf(indexOfFiles));
         }
-
 
     }
 
@@ -175,9 +132,10 @@ public class MainActivity extends Activity {
         current = Calendar.getInstance();
 
         TimeZone tzCurrent = current.getTimeZone();
-        return tzCurrent.getRawOffset()/ (60 * 60 * 1000);
+        return tzCurrent.getRawOffset() / (60 * 60 * 1000);
 
     }
+
     //Method to check if we are in the same time zone as entered by user. If yes then passing the 0 index to the array so
     //it will display the same image.
     private int compareSameTimeZone(int timeZone) {
@@ -185,9 +143,9 @@ public class MainActivity extends Activity {
         Calendar current = Calendar.getInstance();
 
         TimeZone tzCurrent = current.getTimeZone();
-        int time  = tzCurrent.getRawOffset()/ (60 * 60 * 1000);
+        int time = tzCurrent.getRawOffset() / (60 * 60 * 1000);
 
-        if (timeZone != time){
+        if (timeZone != time) {
 
             return timeZone; //not in the same time zone
         }
@@ -200,6 +158,63 @@ public class MainActivity extends Activity {
         return (int) (dp * scale + 0.5f);
     }
 
+
+    public int findTime(int time) {
+        int defaultNumber = 85;
+        int timeToAdd = 60;
+        switch (time) {
+            case 1:
+                return 25;
+            case 2:
+                return defaultNumber;
+            case 3:
+                return defaultNumber + timeToAdd;
+            case 4:
+                return defaultNumber + timeToAdd * 2;
+            case 5:
+                return defaultNumber + timeToAdd * 3;
+            case 6:
+                return defaultNumber + timeToAdd * 4;
+            case 7:
+                return defaultNumber + timeToAdd * 5;
+            case 8:
+                return defaultNumber + timeToAdd * 6;
+            case 9:
+                return defaultNumber + timeToAdd * 7;
+            case 10:
+                return defaultNumber + timeToAdd * 8;
+            case 11:
+                return defaultNumber + timeToAdd * 9;
+            case 12:
+                return defaultNumber + timeToAdd * 10;
+            case 13:
+                return defaultNumber + timeToAdd * 11;
+            case 14:
+                return defaultNumber + timeToAdd * 12;
+            case 15:
+                return defaultNumber + timeToAdd * 13;
+            case 16:
+                return defaultNumber + timeToAdd * 14;
+            case 17:
+                return defaultNumber + timeToAdd * 15;
+            case 18:
+                return defaultNumber + timeToAdd * 16;
+            case 19:
+                return defaultNumber + timeToAdd * 17;
+            case 20:
+                return defaultNumber + timeToAdd * 18;
+            case 21:
+                return defaultNumber + timeToAdd * 19;
+            case 22:
+                return defaultNumber + timeToAdd * 20;
+            case 23:
+                return defaultNumber + timeToAdd * 21;
+            case 24:
+                return defaultNumber + timeToAdd * 22;
+
+        }
+        return 0;
+    }
 
     private class ViewHolder {
         ImageView image;
