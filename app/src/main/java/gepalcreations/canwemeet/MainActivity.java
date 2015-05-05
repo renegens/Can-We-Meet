@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 
 public class MainActivity extends Activity {
@@ -31,52 +31,46 @@ public class MainActivity extends Activity {
 
     private static final int hoursPerDp = 20;
     private static final String TAG = "TimeZone";
+	int timeZone = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Getting time from clock animation class in minutes
+        //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
         int currentMinutes = mClock.getMinutes();
         int currentHours = mClock.getHours();
-        Log.e(TAG, String.valueOf(currentHours));
-        Log.e(TAG, String.valueOf(currentMinutes));
+		int currentTimeZone = mClock.getTimeZone();
+		Log.e("hours",String.valueOf(currentHours));
 
 
         //Loading Layout
         timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
-        timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
+		timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
         line = (View) findViewById(R.id.line);
 
         int timeCalculation = getTimeCalculation(currentMinutes, currentHours);
         line.setTranslationY(timeCalculation);
 
-        //getting current timeZone from system
-        int timeZone = getTimeZone();
         //checking if we are in the same time zone to do other logic.
-        int timeZoneCheck = compareSameTimeZone(timeZone);
-        //if (timeZoneCheck == 1) {
-        //    timeZone = 0;
-        //}
+        int timeZoneCheck = compareSameTimeZone(timeZone,currentTimeZone);
+        if (timeZoneCheck == 1) {
+            timeZone = 0;
+        }
 
-        Log.e(TAG, String.valueOf(getTimeZone()));
         loadImages(timeZone);
     }
 
     private int getTimeCalculation(int currentMinutes, int currentHours) {
         //Calculate time for line animation
-        float screenDensity = getResources().getDisplayMetrics().density;
-        Log.e("ScreenSize", String.valueOf(screenDensity));
-
-
-        float fTimeCalculation = (currentHours * hoursPerDp * screenDensity + currentMinutes);
-        int timeCalculation = (int) fTimeCalculation;
+		int timeCalculation = currentHours * hoursPerDp + currentMinutes;
+		int pixels = dpToPixels(context,timeCalculation);
 
         Log.e("TimeCalculation", String.valueOf(timeCalculation));
-        return timeCalculation;
+        return pixels;
     }
 
     ViewHolder holder;
@@ -84,8 +78,7 @@ public class MainActivity extends Activity {
 
     public void loadImages(int timeZone) {
 
-        String imageName = "";
-        //boolean startAgain = false;
+        String imageName;
 
         //checking and correcting for negative value
         if (timeZone < 0) {
@@ -111,8 +104,7 @@ public class MainActivity extends Activity {
                 v.setTag(holder);
                 timeLinearLayout.addView(v);
             }
-            Log.e("index is", String.valueOf(i));
-            Log.e("index of file", String.valueOf(indexOfFiles));
+
         }
 
     }
@@ -125,35 +117,25 @@ public class MainActivity extends Activity {
         return new BitmapDrawable(context.getResources(), bitmap);
     }
 
-    //Getting Local time zone from system
-    private int getTimeZone() {
-        current = Calendar.getInstance();
 
-        TimeZone tzCurrent = current.getTimeZone();
-        return tzCurrent.getRawOffset() / (60 * 60 * 1000);
-
-    }
 
     //Method to check if we are in the same time zone as entered by user. If yes then passing the 0 index to the array so
     //it will display the same image.
-    private int compareSameTimeZone(int timeZone) {
+    private int compareSameTimeZone(int timeZone, int currentTimeZone) {
 
-        Calendar current = Calendar.getInstance();
-
-        TimeZone tzCurrent = current.getTimeZone();
-        int time = tzCurrent.getRawOffset() / (60 * 60 * 1000);
-
-        if (timeZone != time) {
-
-            return timeZone; //not in the same time zone
+		int timeZoneIsSame = 0; //initialize to not in same zone
+        if (timeZone == currentTimeZone) {
+			timeZoneIsSame = 1; //in same time zone
         }
-        int timeZoneIsSame = 1;
-        return timeZoneIsSame; //in same time zone
-    }
+		return timeZoneIsSame;
+
+	}
 
     public static int dpToPixels(Context context, float dp) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dp * scale + 0.5f);
+
+		DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+		return (int)((dp * displayMetrics.density) + 0.5);
+
     }
 
     private class ViewHolder {
