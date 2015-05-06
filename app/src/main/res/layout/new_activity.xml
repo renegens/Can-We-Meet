@@ -275,7 +275,7 @@
 
 			</LinearLayout>
 			<LinearLayout
-
+				android:id="@+id/timezone"
 				android:orientation="vertical"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
@@ -521,5 +521,26 @@
 			android:layout_width="fill_parent"
 			android:layout_height="1dp"
 			android:background="@color/md_grey_500" />
+		<ImageView
+			android:id="@+id/testimage"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/abc_btn_rating_star_on_mtrl_alpha"/>
+		<ImageView
+			android:id="@+id/testimage2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/abc_btn_rating_star_on_mtrl_alpha"/>
+		<ImageView
+			android:id="@+id/testimage3"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/abc_btn_rating_star_on_mtrl_alpha"/>
+		<ImageView
+			android:id="@+id/testimage4"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/abc_btn_rating_star_on_mtrl_alpha"/>
+
 	</RelativeLayout>
 </LinearLayout>

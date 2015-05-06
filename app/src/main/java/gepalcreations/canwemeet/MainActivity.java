@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
 
     private LinearLayout timeLinearLayout;
     private View line;
+	private ImageView testImage, testImage2, testImage3, testImage4;
     Context context = this;
 
 	int timeZone = 2; //for testing
@@ -51,6 +52,23 @@ public class MainActivity extends Activity {
 		//timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
         line = findViewById(R.id.line);
+		testImage = (ImageView) findViewById(R.id.testimage);
+		testImage2 = (ImageView) findViewById(R.id.testimage2);
+		testImage3 = (ImageView) findViewById(R.id.testimage3);
+		testImage4 = (ImageView) findViewById(R.id.testimage4);
+
+		testImage.setTranslationY(250);
+		testImage.setTranslationX(250);
+		testImage2.setTranslationY(450);
+		testImage2.setTranslationX(250);
+		testImage3.setTranslationY(780);
+		testImage3.setTranslationX(250);
+		testImage4.setTranslationY(1270);
+		testImage4.setTranslationX(250);
+
+
+
+
 
         float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
         line.setTranslationY(timeCalculation);
@@ -62,13 +80,20 @@ public class MainActivity extends Activity {
         }
 
         //loadImages(timeZone);
-		loadImagesFromXML(timeZone);
+		//loadImagesFromXML(timeZone);
     }
 
     ViewHolder holder;
 
 	public void loadImagesFromXML(int timeZone) {
-
+		View [] arrayView =
+				{findViewById(R.id.hour_1),findViewById(R.id.hour_2), findViewById(R.id.hour_3), findViewById(R.id.hour_4),
+						findViewById(R.id.hour_5),findViewById(R.id.hour_6), findViewById(R.id.hour_7), findViewById(R.id.hour_8),
+						findViewById(R.id.hour_9),findViewById(R.id.hour_10), findViewById(R.id.hour_11), findViewById(R.id.hour_12),
+						findViewById(R.id.hour_13),findViewById(R.id.hour_14), findViewById(R.id.hour_15), findViewById(R.id.hour_16),
+						findViewById(R.id.hour_17),findViewById(R.id.hour_18), findViewById(R.id.hour_19), findViewById(R.id.hour_20),
+						findViewById(R.id.hour_21),findViewById(R.id.hour_22), findViewById(R.id.hour_23), findViewById(R.id.hour_24)
+				};
 		String imageName;
 		//checking and correcting for negative value
 		if (timeZone < 0) {
@@ -77,11 +102,12 @@ public class MainActivity extends Activity {
 
 		for (int i = 0; i < 25; i++) {
 			int indexOfFiles = (i + timeZone) % 25;
-			LayoutInflater inflater = getLayoutInflater();
-			View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
-			holder = new ViewHolder();
-			holder.image = (ImageView) v.findViewById(R.id.time_image);
-			if (indexOfFiles != 0) {
+			View view = arrayView[indexOfFiles];
+			view.bringToFront();
+			//LayoutInflater inflater = getLayoutInflater();
+			//holder = new ViewHolder();
+			//holder.image = (ImageView) v.findViewById(R.id.time_image);
+			/*if (indexOfFiles != 0) {
 				imageName = "time24h" + indexOfFiles;
 				try {
 					holder.image.setImageDrawable(getAssetImage(this, imageName));
@@ -90,7 +116,7 @@ public class MainActivity extends Activity {
 				}
 				v.setTag(holder);
 				timeLinearLayout.addView(v);
-			}
+			}*/
 		}
 	}
     public void loadImages(int timeZone) {
