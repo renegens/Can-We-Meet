@@ -3,13 +3,14 @@ package gepalcreations.canwemeet;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,20 +19,14 @@ import android.widget.LinearLayout;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
-
 
 public class MainActivity extends Activity {
 
     private LinearLayout timeLinearLayout;
-    private Calendar current;
     private View line;
     Context context = this;
 
-
-    private static final int hoursPerDp = 20;
-    private static final String TAG = "TimeZone";
-	int timeZone = 2;
+	int timeZone = 2; //for testing
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,22 +39,20 @@ public class MainActivity extends Activity {
         int currentHours = mClock.getHours();
 		int currentTimeZone = mClock.getTimeZone();
 
-		Log.e("hours", String.valueOf(currentHours));
-		float height = getScreenHeight();/*-getDensityPixelToRemove(context);*/
+		//Log.e("hours", String.valueOf(currentHours));
+		int height = getScreenHeight() - getDensityPixelToRemove(context);
 
-		Log.e("Screen Height",String.valueOf(getScreenHeight()));
-		Log.e("Screen Density",String.valueOf(getDensityPixelToRemove(context)));
-		Log.e("Final Height",String.valueOf(height));
+		//Log.e("Screen Height",String.valueOf(getScreenHeight()));
+		//Log.e("Screen Density",String.valueOf(getDensityPixelToRemove(context)));
+		//Log.e("Final Height",String.valueOf(height));
 
         //Loading Layout
         timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
 		timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
-        line = (View) findViewById(R.id.line);
+        line = findViewById(R.id.line);
 
-        float timeCalculation = getTimeCalculation(currentMinutes, currentHours, height);
-		String floatingTime = String.valueOf(timeCalculation)+"dp";
-		Log.e("floating time",floatingTime);
+        float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
         line.setTranslationY(timeCalculation);
 
         //checking if we are in the same time zone to do other logic.
@@ -71,21 +64,12 @@ public class MainActivity extends Activity {
         loadImages(timeZone);
     }
 
-    private float getTimeCalculation(int currentMinutes, int currentHours, float height) {
-        //Calculate time for line animation
-		float pixelPerHour = height / 24;
-		float timeCalculation = currentHours * pixelPerHour + currentMinutes;
-        Log.e("TimeCalculation", String.valueOf(timeCalculation));
-        return timeCalculation;
-    }
-
     ViewHolder holder;
 
 
     public void loadImages(int timeZone) {
 
         String imageName;
-
         //checking and correcting for negative value
         if (timeZone < 0) {
             timeZone = timeZone * (-1);
@@ -97,11 +81,8 @@ public class MainActivity extends Activity {
             View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
             holder = new ViewHolder();
             holder.image = (ImageView) v.findViewById(R.id.time_image);
-
             if (indexOfFiles != 0) {
                 imageName = "time24h" + indexOfFiles;
-
-
                 try {
                     holder.image.setImageDrawable(getAssetImage(this, imageName));
                 } catch (IOException e) {
@@ -110,9 +91,7 @@ public class MainActivity extends Activity {
                 v.setTag(holder);
                 timeLinearLayout.addView(v);
             }
-
         }
-
     }
 
 
@@ -122,42 +101,42 @@ public class MainActivity extends Activity {
         Bitmap bitmap = BitmapFactory.decodeStream(buffer);
         return new BitmapDrawable(context.getResources(), bitmap);
     }
+
 	private static int getDensityPixelToRemove (Context context) {
 
 		float density = context.getResources().getDisplayMetrics().density;
+		//action bar 48dp and status bar 20dp
 		if (density >= 4.0) {
-			return 100;
+			return 272;//48+20*3
 		}
 		if (density >= 3.0) {
-			return 76;
+			return 204;
 		}
 		if (density >= 2.0) {
-			return 50;
+			return 136;
 		}
 		if (density >= 1.5) {
-			return 38;
+			return 102;
 		}
-		return 12;
+		return 68;
 	}
-	public float getScreenHeight(){
-		Configuration configuration = this.getResources().getConfiguration();
-		float height = configuration.screenHeightDp;
 
-		/*Display display = getWindowManager().getDefaultDisplay();
+	public int getScreenHeight(){
 
+		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
 		Point size = new Point();
 		display.getSize(size);
-		//int width = size.x;
-		//int height = size.y;
-*/
+		return size.y;
+	}
 
+	//Calculate time for line animation
+	private float getTimeCalculation(int currentHours, int currentMinutes, float height) {
+		float pixelPerHour = height / 25;
 
-		Log.e("Screen Height--->",String.valueOf(height));
-		return height;
-
+		return currentHours * pixelPerHour + currentMinutes;
 	}
 
     //Method to check if we are in the same time zone as entered by user. If yes then passing the 0 index to the array so
@@ -169,7 +148,6 @@ public class MainActivity extends Activity {
 			timeZoneIsSame = 1; //in same time zone
         }
 		return timeZoneIsSame;
-
 	}
 
     private class ViewHolder {
