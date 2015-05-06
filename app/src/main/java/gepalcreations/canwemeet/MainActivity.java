@@ -50,10 +50,10 @@ public class MainActivity extends Activity {
         //timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
 		//timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
-        //line = findViewById(R.id.line);
+        line = findViewById(R.id.line);
 
         float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
-        //line.setTranslationY(timeCalculation);
+        line.setTranslationY(timeCalculation);
 
         //checking if we are in the same time zone to do other logic.
         int timeZoneCheck = compareSameTimeZone(timeZone,currentTimeZone);
@@ -62,11 +62,37 @@ public class MainActivity extends Activity {
         }
 
         //loadImages(timeZone);
+		loadImagesFromXML(timeZone);
     }
 
     ViewHolder holder;
 
+	public void loadImagesFromXML(int timeZone) {
 
+		String imageName;
+		//checking and correcting for negative value
+		if (timeZone < 0) {
+			timeZone = timeZone * (-1);
+		}
+
+		for (int i = 0; i < 25; i++) {
+			int indexOfFiles = (i + timeZone) % 25;
+			LayoutInflater inflater = getLayoutInflater();
+			View v = inflater.inflate(R.layout.time_layout, timeLinearLayout, false);
+			holder = new ViewHolder();
+			holder.image = (ImageView) v.findViewById(R.id.time_image);
+			if (indexOfFiles != 0) {
+				imageName = "time24h" + indexOfFiles;
+				try {
+					holder.image.setImageDrawable(getAssetImage(this, imageName));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				v.setTag(holder);
+				timeLinearLayout.addView(v);
+			}
+		}
+	}
     public void loadImages(int timeZone) {
 
         String imageName;
