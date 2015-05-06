@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.new_activity);
 
         //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
@@ -47,13 +47,13 @@ public class MainActivity extends Activity {
 		//Log.e("Final Height",String.valueOf(height));
 
         //Loading Layout
-        timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
-		timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
+        //timeLinearLayout = (LinearLayout) findViewById(R.id.time_linear_layout);
+		//timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
-        line = findViewById(R.id.line);
+        //line = findViewById(R.id.line);
 
         float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
-        line.setTranslationY(timeCalculation);
+        //line.setTranslationY(timeCalculation);
 
         //checking if we are in the same time zone to do other logic.
         int timeZoneCheck = compareSameTimeZone(timeZone,currentTimeZone);
@@ -61,7 +61,7 @@ public class MainActivity extends Activity {
             timeZone = 0;
         }
 
-        loadImages(timeZone);
+        //loadImages(timeZone);
     }
 
     ViewHolder holder;
