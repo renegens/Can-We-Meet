@@ -337,8 +337,8 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="60dp"
-            android:paddingTop="162dp"
+            android:layout_marginLeft="60dp"
+            android:laoyt="162dp"
             android:src="@drawable/ic_coffee"/>
 
         <ImageView
