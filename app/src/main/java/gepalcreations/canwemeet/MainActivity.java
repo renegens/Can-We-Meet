@@ -4,17 +4,14 @@ package gepalcreations.canwemeet;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+
 import android.os.Bundle;
 
-import android.app.SearchManager;
+import android.widget.ImageView;
 import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -23,19 +20,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import android.view.View;
-import android.widget.ImageView;
+
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
 
 public class MainActivity extends Activity {
 
     private LinearLayout timeLinearLayout;
     private View line;
-    private ImageView testImage, testImage2, testImage3, testImage4;
     Context context = this;
 
     int timeZone = 5; //for testing
@@ -65,19 +59,7 @@ public class MainActivity extends Activity {
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
         line = findViewById(R.id.line);
-        //testImage = (ImageView) findViewById(R.id.testimage);
-        // testImage2 = (ImageView) findViewById(R.id.testimage2);
-        //testImage3 = (ImageView) findViewById(R.id.testimage3);
-        // testImage4 = (ImageView) findViewById(R.id.testimage4);
 
-//        testImage.setTranslationY(250);
-        //     testImage.setTranslationX(250);
-        //     testImage2.setTranslationY(450);
-        //     testImage2.setTranslationX(250);
-        //     testImage3.setTranslationY(780);
-        //     testImage3.setTranslationX(250);
-        //     testImage4.setTranslationY(1270);
-        //      testImage4.setTranslationX(250);
 
 
         float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
@@ -124,10 +106,25 @@ public class MainActivity extends Activity {
             if (indexOfFiles != 0) {
 
                 holder.hour = (TextView) v.findViewById(R.id.hours);
+
                 holder.hour.setText(String.valueOf(indexOfFiles));
+                //holder.icon = (ImageView) v.findViewById(R.id.time_icon);
+
+
                 LinearLayout.LayoutParams hourParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
-                if (indexOfFiles >= 1 && indexOfFiles <= 7)
+                if (indexOfFiles >= 1 && indexOfFiles <= 7){
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
+                    if (indexOfFiles==1){
+                        //int sleepStart = hour.getHeight();
+                        //Log.e("Height of Start Sleep",String.valueOf(sleepStart));
+                    }}
+
+                    //den douleuei swsta thelei ftiaksimo
+                    /*if (indexOfFiles == 3 ){
+                        holder.icon.setImageResource(R.drawable.ic_sleep);
+                        holder.icon.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
+                    }}*/
+
                 else if (indexOfFiles >= 8 && indexOfFiles <= 9)
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_teal_500));
                 else if (indexOfFiles >= 10 && indexOfFiles <= 17)
@@ -136,18 +133,12 @@ public class MainActivity extends Activity {
 
                 holder.hour.setPaddingRelative(10, 0, 0, 0);
 
+
                 v.setTag(holder);
                 timeLinearLayout.addView(v, hourParams);
             }
             Log.i("index", String.valueOf(indexOfFiles));
         }
-    }
-
-    public static Drawable getAssetImage(Context context, String filename) throws IOException {
-        AssetManager assets = context.getResources().getAssets();
-        InputStream buffer = new BufferedInputStream((assets.open("drawable/" + filename + ".jpeg")));
-        Bitmap bitmap = BitmapFactory.decodeStream(buffer);
-        return new BitmapDrawable(context.getResources(), bitmap);
     }
 
     private static int getDensityPixelToRemove(Context context) {
@@ -200,6 +191,7 @@ public class MainActivity extends Activity {
 
     private class ViewHolder {
         TextView hour;
+        ImageView icon;
     }
 
 }
