@@ -1,6 +1,8 @@
 package gepalcreations.canwemeet;
 
+
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -9,10 +11,17 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+
+import android.app.SearchManager;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,12 +38,14 @@ public class MainActivity extends Activity {
     private ImageView testImage, testImage2, testImage3, testImage4;
     Context context = this;
 
-    int timeZone = 2; //for testing
+    int timeZone = 5; //for testing
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_activity);
+        setContentView(R.layout.activity_main);
+
+
 
         //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
@@ -79,6 +90,21 @@ public class MainActivity extends Activity {
         }
 
         loadImagesFromXML(timeZone);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
     }
 
     ViewHolder holder;
@@ -129,16 +155,16 @@ public class MainActivity extends Activity {
         float density = context.getResources().getDisplayMetrics().density;
         //action bar 48dp and status bar 20dp
         if (density >= 4.0) {
-            return 272;//48+20*3
+            return 384;//48+20+60*3
         }
         if (density >= 3.0) {
-            return 204;
+            return 244;
         }
         if (density >= 2.0) {
-            return 136;
+            return 176;
         }
         if (density >= 1.5) {
-            return 102;
+            return 142;
         }
         return 68;
     }
