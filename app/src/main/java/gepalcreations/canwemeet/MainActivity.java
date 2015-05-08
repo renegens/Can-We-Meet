@@ -9,6 +9,7 @@ import android.graphics.Point;
 
 import android.os.Bundle;
 
+import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.SearchView;
 
@@ -24,6 +25,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends Activity {
@@ -31,14 +34,13 @@ public class MainActivity extends Activity {
     private LinearLayout timeLinearLayout;
     private View line;
     Context context = this;
-
+    static int activityHeight = 0;
     int timeZone = 5; //for testing
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
 
         //Getting time from clock and timezone animation class in minutes
@@ -61,7 +63,6 @@ public class MainActivity extends Activity {
         line = findViewById(R.id.line);
 
 
-
         float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
         line.setTranslationY(timeCalculation);
 
@@ -71,8 +72,16 @@ public class MainActivity extends Activity {
             timeZone = 0;
         }
 
+        setPaddingToTextViews();
+
         loadImagesFromXML(timeZone);
+
+        Log.i("Height2", String.valueOf(getScreenHeight()));
+        Log.i("Height3", String.valueOf(getActionBarHeight()));
+        Log.i("Height4", String.valueOf(getStatusBarHeight()));
+
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -112,22 +121,23 @@ public class MainActivity extends Activity {
 
 
                 LinearLayout.LayoutParams hourParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
-                if (indexOfFiles >= 1 && indexOfFiles <= 7){
+                if (indexOfFiles >= 1 && indexOfFiles <= 7) {
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
-                    if (indexOfFiles==1){
+                    if (indexOfFiles == 1) {
                         //int sleepStart = hour.getHeight();
                         //Log.e("Height of Start Sleep",String.valueOf(sleepStart));
-                    }}
+                    }
+                }
 
-                    //den douleuei swsta thelei ftiaksimo
+                //den douleuei swsta thelei ftiaksimo
                     /*if (indexOfFiles == 3 ){
                         holder.icon.setImageResource(R.drawable.ic_sleep);
                         holder.icon.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
                     }}*/
 
-                else if (indexOfFiles >= 8 && indexOfFiles <= 9)
+                else if (indexOfFiles >= 8 && indexOfFiles <= 10)
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_teal_500));
-                else if (indexOfFiles >= 10 && indexOfFiles <= 17)
+                else if (indexOfFiles >= 11 && indexOfFiles <= 17)
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_amber_500));
                 else holder.hour.setBackgroundColor(getResources().getColor(R.color.md_brown_500));
 
@@ -160,6 +170,17 @@ public class MainActivity extends Activity {
         return 68;
     }
 
+    public int getScreenWidth() {
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        Point size = new Point();
+        display.getSize(size);
+        return size.x;
+    }
+
     public int getScreenHeight() {
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -169,6 +190,65 @@ public class MainActivity extends Activity {
         Point size = new Point();
         display.getSize(size);
         return size.y;
+    }
+
+    public int getActionBarHeight() {
+        // Calculate ActionBar height
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            return TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+        return 0;
+    }
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    public void setPaddingToTextViews() {
+        int[] textViewIds = {R.id.hereTextView, R.id.hour_1, R.id.hour_2, R.id.hour_3, R.id.hour_4, R.id.hour_5, R.id.hour_6, R.id.hour_7, R.id.hour_8, R.id.hour_9, R.id.hour_10, R.id.hour_11, R.id.hour_12, R.id.hour_13, R.id.hour_14, R.id.hour_15, R.id.hour_16, R.id.hour_17, R.id.hour_18, R.id.hour_19, R.id.hour_20, R.id.hour_21, R.id.hour_22, R.id.hour_23, R.id.hour_24,};
+        List<TextView> textViews = new ArrayList<>();
+        int activityHeight = getScreenHeight() - getActionBarHeight() - getStatusBarHeight();
+        int sum = 0, pixelsDiff;
+        double padding;
+        for (int i : textViewIds) {
+            TextView textView = (TextView) findViewById(i);
+
+            int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(getScreenWidth(), View.MeasureSpec.AT_MOST);
+            int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+            textView.measure(widthMeasureSpec, heightMeasureSpec);
+            sum += textView.getMeasuredHeight();
+            textViews.add(textView);
+        }
+        Log.i("sum", String.valueOf(sum));
+        pixelsDiff = activityHeight - sum;
+        padding = ((double) pixelsDiff / 24) / 2;
+        Log.i("padding", String.valueOf(padding));
+        Log.i("padding_floor", String.valueOf(Math.floor(padding)));
+        Log.i("padding_ceil", String.valueOf(Math.ceil(padding)));
+        for (TextView t : textViews) {
+            // Math.floor -> px 4.5 to kanei 4
+            // Math.ceil -> px 4.5 to kanei 5
+            t.setPadding(0, (int) Math.floor(padding), dpToPx(10), (int) Math.ceil(padding));
+        }
+
+    }
+
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
+    }
+
+    public int pxToDp(int px) {
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        int dp = Math.round(px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return dp;
     }
 
     //Calculate time for line animation
