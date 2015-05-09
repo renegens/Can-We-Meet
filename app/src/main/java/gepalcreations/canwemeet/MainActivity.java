@@ -3,35 +3,33 @@ package gepalcreations.canwemeet;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
-
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
-
 import android.os.Bundle;
-
 import android.os.Environment;
-import android.util.TypedValue;
-import android.view.MenuItem;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.SearchView;
-
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-
+import android.view.MenuItem;
 import android.view.View;
-
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,7 +44,6 @@ public class MainActivity extends Activity {
     private View line;
     Context context = this;
     static int activityHeight = 0;
-    int timeZone = 5; //for testing
     String searchedCity = "New York";
     private Measures measures;
 
@@ -91,8 +88,35 @@ public class MainActivity extends Activity {
         int currentHours = mClock.getHours();
         int currentTimeZone = mClock.getTimeZone();
 
+		// get current moment in default time zone
+
+		DateTime dt = new DateTime();
+		// translate to London local time
+		String searchTime = "Europe/Berlin";
+		DateTime dtLondon = dt.withZone(DateTimeZone.forID(searchTime));
+
+		java.util.Date date = new java.util.Date(System.currentTimeMillis());
+		DateTimeZone dtz = DateTimeZone.getDefault();// Gets the default time zone.
+		DateTime dateTime = new DateTime(date.getTime(), dtz);
+		int timeZoneDifference = dtLondon.getHourOfDay() - dateTime.getHourOfDay();
+
+		Log.i("Difference", String.valueOf(timeZoneDifference));
+		Log.i("Date time from yoda", String.valueOf(dateTime));
+		Log.i("Date time zone for id", String.valueOf(dtLondon));
+
+
+
+
+
+
+
+
+
+
+
+
         //Log.e("hours", String.valueOf(currentHours));
-        int height = getScreenHeight() - getDensityPixelToRemove(context);
+        //int height = getScreenHeight() - getDensityPixelToRemove(context);
 
         //Log.e("Screen Height",String.valueOf(getScreenHeight()));
         //Log.e("Screen Density",String.valueOf(getDensityPixelToRemove(context)));
@@ -102,7 +126,7 @@ public class MainActivity extends Activity {
         timeLinearLayout = (LinearLayout) findViewById(R.id.current_time_linear);
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
         //Loading Line
-        line = findViewById(R.id.line);
+        //line = findViewById(R.id.line);
 
         File screenShotsDir = new File(Environment.getExternalStorageDirectory(), "CanWeMeet");
 
@@ -112,20 +136,20 @@ public class MainActivity extends Activity {
 
 
         //checking if we are in the same time zone to do other logic.
-        int timeZoneCheck = compareSameTimeZone(timeZone, currentTimeZone);
+        int timeZoneCheck = compareSameTimeZone(timeZoneDifference, currentTimeZone);
         if (timeZoneCheck == 1) {
-            timeZone = 0;
+            timeZoneDifference = 0;
         }
 
         measures = new Measures();
 
         setPaddingToTextViews();
 
-        loadImagesFromXML(timeZone);
+        loadImagesFromXML(timeZoneDifference);
 
         // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
-        float timeCalculation = getTimeCalculation(currentHours, currentMinutes, measures.getLeftLinearHeight());
-        line.setTranslationY(timeCalculation);
+        //float timeCalculation = getTimeCalculation(currentHours, currentMinutes, measures.getLeftLinearHeight());
+        //line.setTranslationY(timeCalculation);
 
 
     }
@@ -134,22 +158,27 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
+		ComponentName cn = new ComponentName(this, SearchActivity.class);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+		// Get the SearchView and set the searchable configuration
+		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+		// Assumes current activity is the searchable activity
+		searchView.setSearchableInfo(searchManager.getSearchableInfo(cn));
+		//searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
+		return true;
 
 
-        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle presses on the action bar items
         switch (item.getItemId()) {
+			case R.id.menu_search:
+				onSearchRequested();
+				return true;
             case R.id.capture:
                 line.setVisibility(View.GONE);
                 LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -158,11 +187,12 @@ public class MainActivity extends Activity {
 
                 Bitmap bmp = getBitmapFromView(this.getWindow().getDecorView().findViewById(R.id.main_relative).getRootView());
 
-                URI uri = storPrintFile(bmp);
+                URI uri = storePrintFile(bmp);
 
                 Toast.makeText(getApplicationContext(), "Image Saved at " + uri.getPath(), Toast.LENGTH_SHORT).show();
                 line.setVisibility(View.VISIBLE);
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -183,7 +213,7 @@ public class MainActivity extends Activity {
         return b;
     }
 
-    public URI storPrintFile(Bitmap bitmapToStore) {
+    public URI storePrintFile(Bitmap bitmapToStore) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         String path = Environment.getExternalStorageDirectory() + File.separator + "CanWeMeet" + File.separator;
         File file = new File(path);

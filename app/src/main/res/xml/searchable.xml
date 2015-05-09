@@ -2,4 +2,11 @@
 
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
     android:label="@string/app_name"
-    android:hint="@string/search_hint" />
+    android:hint="@string/search_hint"
+	android:searchMode="showSearchLabelAsBadge"
+	android:searchSettingsDescription="Custom Suggestions"
+	android:queryAfterZeroResults="false"
+
+	android:searchSuggestSelection=" ? "
+	android:searchSuggestIntentAction="android.intent.action.VIEW"
+	android:voiceSearchMode="showVoiceSearchButton"/>
