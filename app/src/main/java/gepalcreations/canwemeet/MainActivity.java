@@ -50,6 +50,35 @@ public class MainActivity extends Activity {
     String searchedCity = "New York";
     private Measures measures;
 
+    // Pacific (US) -> US/Pacific
+    // Pacific New (US) -> US/Pacific-New
+    // Pacific (Canada) -> Canada/Pacific
+    // "Shiprock, Navajo"
+    // Mountain (US) -> US/Mountain
+    // Mountain (Canada) -> Canada/Mountain
+    // Knox (Indiana) -> America/Indiana/Knox
+    // Knox IN -> America/Knox_IN
+    // Starke (Indiana) -> US/Indiana-Starke
+    // ^--"America/Knox_IN, US/Indiana-Starke"
+    // Tell City (Indiana) -> America/Indiana/Tell_City
+    // New Salem (North Dakota) -> America/North_Dakota/New_Salem
+    // East Saskatchewan -> Canada/East-Saskatchewan
+    // ^-- Canada/East-Saskatchewan, Canada/Saskatchewan
+
+    private static final String[] cities = new String[]{
+            "Apia", "Midway", "Niue", "Pago Pago", "Samoa", "Adak", "Atka", "Aleutian",
+            "Fakaofo", "Honolulu", "Hawaii", "Johnston", "Rarotonga", "Tahiti", "Marquesas",
+            "Anchorage", "Alaska", "Juneau", "Nome", "Yakutat", "Gambier", "Dawson", "Los Angeles",
+            "Pacific (US)", "Pacific New (US)", "Santa Isabel", "Tijuana", "Ensenada", "BajaNorte", "Vancouver",
+            "Pacific (Canada)", "Whitehorse", "Yukon", "Pitcairn", "Boise", "Cambridge Bay", "Chihuahua",
+            "Dawson Creek", "Denver", "Shiprock", "Navajo", "Mountain (US)", "Edmonton", "Mountain (Canada)",
+            "Hermosillo", "Inuvik", "Mazatlan", "BajaSur", "Ojinaga", "Phoenix", "Arizona", "Yellowknife",
+            "Bahia Banderas", "Belize", "Cancun", "Chicago", "Central", "Costa Rica", "El Salvador", "Guatemala",
+            "Knox (Indiana)", "Knox IN", "Starke (Indiana)", "Tell City (Indiana)", "Managua", "Matamoros", "Menominee",
+            "Merida", "Mexico City", "Monterrey", "New Salem (North Dakota)", "Rainy River", "Rankin Inlet", "Regina",
+            "East Saskatchewan", "Saskatchewan"
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
