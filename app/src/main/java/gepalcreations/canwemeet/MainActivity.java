@@ -5,12 +5,19 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 
+import android.content.ContextWrapper;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Point;
 
 import android.os.Bundle;
 
+import android.os.Environment;
 import android.util.TypedValue;
+import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import android.util.DisplayMetrics;
@@ -24,7 +31,11 @@ import android.view.View;
 
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +47,8 @@ public class MainActivity extends Activity {
     Context context = this;
     static int activityHeight = 0;
     int timeZone = 5; //for testing
+    String searchedCity = "New York";
+    private Measures measures;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +75,12 @@ public class MainActivity extends Activity {
         //Loading Line
         line = findViewById(R.id.line);
 
+        File screenShotsDir = new File(Environment.getExternalStorageDirectory(), "CanWeMeet");
 
-        float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
-        line.setTranslationY(timeCalculation);
+        if (!screenShotsDir.exists()) {
+            screenShotsDir.mkdirs();
+        }
+
 
         //checking if we are in the same time zone to do other logic.
         int timeZoneCheck = compareSameTimeZone(timeZone, currentTimeZone);
@@ -72,13 +88,16 @@ public class MainActivity extends Activity {
             timeZone = 0;
         }
 
+        measures = new Measures();
+
         setPaddingToTextViews();
 
         loadImagesFromXML(timeZone);
 
-        Log.i("Height2", String.valueOf(getScreenHeight()));
-        Log.i("Height3", String.valueOf(getActionBarHeight()));
-        Log.i("Height4", String.valueOf(getStatusBarHeight()));
+        // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
+        float timeCalculation = getTimeCalculation(currentHours, currentMinutes, measures.getLeftLinearHeight());
+        line.setTranslationY(timeCalculation);
+
 
     }
 
@@ -95,7 +114,62 @@ public class MainActivity extends Activity {
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
 
+
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.capture:
+                line.setVisibility(View.GONE);
+                LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+                RelativeLayout root = (RelativeLayout) inflater.inflate(R.layout.activity_main, null);
+                root.setDrawingCacheEnabled(true);
+
+                Bitmap bmp = getBitmapFromView(this.getWindow().getDecorView().findViewById(R.id.main_relative).getRootView());
+
+                URI uri = storPrintFile(bmp);
+
+                Toast.makeText(getApplicationContext(), "Image Saved at " + uri.getPath(), Toast.LENGTH_SHORT).show();
+                line.setVisibility(View.VISIBLE);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public Bitmap getBitmapFromView(View v) {
+        v.setLayoutParams(new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT));
+        v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+        Bitmap b = Bitmap.createBitmap(v.getMeasuredWidth(),
+                v.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas c = new Canvas(b);
+        v.draw(c);
+        return b;
+    }
+
+    public URI storPrintFile(Bitmap bitmapToStore) {
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        String path = Environment.getExternalStorageDirectory() + File.separator + "CanWeMeet" + File.separator;
+        File file = new File(path);
+        String current = searchedCity + ".jpg";//uniqueId.replace(" ", "-").replace(":", "-") + ".jpeg";
+        File mypath = new File(file, current);
+        try {
+            FileOutputStream out = new FileOutputStream(mypath);
+            bitmapToStore.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mypath.toURI();
     }
 
     ViewHolder holder;
@@ -123,25 +197,13 @@ public class MainActivity extends Activity {
                 LinearLayout.LayoutParams hourParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
                 if (indexOfFiles >= 1 && indexOfFiles <= 7) {
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
-                    if (indexOfFiles == 1) {
-                        //int sleepStart = hour.getHeight();
-                        //Log.e("Height of Start Sleep",String.valueOf(sleepStart));
-                    }
-                }
-
-                //den douleuei swsta thelei ftiaksimo
-                    /*if (indexOfFiles == 3 ){
-                        holder.icon.setImageResource(R.drawable.ic_sleep);
-                        holder.icon.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
-                    }}*/
-
-                else if (indexOfFiles >= 8 && indexOfFiles <= 10)
+                } else if (indexOfFiles >= 8 && indexOfFiles <= 10)
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_teal_500));
                 else if (indexOfFiles >= 11 && indexOfFiles <= 17)
                     holder.hour.setBackgroundColor(getResources().getColor(R.color.md_amber_500));
                 else holder.hour.setBackgroundColor(getResources().getColor(R.color.md_brown_500));
 
-                holder.hour.setPaddingRelative(10, 0, 0, 0);
+                holder.hour.setPaddingRelative(dpToPx(10), 0, 0, 0);
 
 
                 v.setTag(holder);
@@ -214,13 +276,16 @@ public class MainActivity extends Activity {
         int[] textViewIds = {R.id.hereTextView, R.id.hour_1, R.id.hour_2, R.id.hour_3, R.id.hour_4, R.id.hour_5, R.id.hour_6, R.id.hour_7, R.id.hour_8, R.id.hour_9, R.id.hour_10, R.id.hour_11, R.id.hour_12, R.id.hour_13, R.id.hour_14, R.id.hour_15, R.id.hour_16, R.id.hour_17, R.id.hour_18, R.id.hour_19, R.id.hour_20, R.id.hour_21, R.id.hour_22, R.id.hour_23, R.id.hour_24,};
         List<TextView> textViews = new ArrayList<>();
         int activityHeight = getScreenHeight() - getActionBarHeight() - getStatusBarHeight();
+        measures.setActivityHeight(activityHeight);
         int sum = 0, pixelsDiff;
         double padding;
+
+        int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(getScreenWidth(), View.MeasureSpec.AT_MOST);
+        int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+
         for (int i : textViewIds) {
             TextView textView = (TextView) findViewById(i);
 
-            int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(getScreenWidth(), View.MeasureSpec.AT_MOST);
-            int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
             textView.measure(widthMeasureSpec, heightMeasureSpec);
             sum += textView.getMeasuredHeight();
             textViews.add(textView);
@@ -234,8 +299,18 @@ public class MainActivity extends Activity {
         for (TextView t : textViews) {
             // Math.floor -> px 4.5 to kanei 4
             // Math.ceil -> px 4.5 to kanei 5
-            t.setPadding(0, (int) Math.floor(padding), dpToPx(10), (int) Math.ceil(padding));
+            t.setPadding(0, (int) Math.ceil(padding), dpToPx(10), (int) Math.ceil(padding));
         }
+        measures.setPadding((int) Math.ceil(padding));
+
+        LinearLayout leftLinear = (LinearLayout) findViewById(R.id.left_layout);
+
+        leftLinear.measure(leftLinear.getWidth(), leftLinear.getHeight());
+
+        measures.setLeftLinearHeight(leftLinear.getMeasuredHeight());
+
+        Log.i("Linear Height", String.valueOf(leftLinear.getMeasuredHeight()));
+        Log.i("Difference", String.valueOf(Math.abs(activityHeight - leftLinear.getMeasuredHeight())));
 
     }
 
@@ -253,7 +328,8 @@ public class MainActivity extends Activity {
 
     //Calculate time for line animation
     private float getTimeCalculation(int currentHours, int currentMinutes, float height) {
-        float pixelPerHour = height / 25;
+        // float pixelPerHour = height / 25;
+        float pixelPerHour = (height / 24) + (measures.getPadding());
 
         return currentHours * pixelPerHour + currentMinutes;
     }
@@ -274,4 +350,31 @@ public class MainActivity extends Activity {
         ImageView icon;
     }
 
+    private static class Measures {
+        int activityHeight, leftLinearHeight, padding;
+
+        public int getActivityHeight() {
+            return activityHeight;
+        }
+
+        public int getLeftLinearHeight() {
+            return leftLinearHeight;
+        }
+
+        public int getPadding() {
+            return padding;
+        }
+
+        public void setActivityHeight(int activityHeight) {
+            this.activityHeight = activityHeight;
+        }
+
+        public void setLeftLinearHeight(int leftLinearHeight) {
+            this.leftLinearHeight = leftLinearHeight;
+        }
+
+        public void setPadding(int padding) {
+            this.padding = padding;
+        }
+    }
 }

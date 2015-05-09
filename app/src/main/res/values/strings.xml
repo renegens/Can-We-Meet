@@ -2,5 +2,5 @@
     <string name="app_name">Can We Meet</string>
     <string name="action_bar_button_search">Search City</string>
     <string name="search_hint">New York</string>
-
+    <string name="capture">Capture</string>
 </resources>
