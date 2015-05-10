@@ -432,7 +432,7 @@
                     <TextView
                         android:id="@+id/current_city"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:background="@color/md_black_1000"
                         android:gravity="center"
@@ -450,7 +450,8 @@
                 android:id="@+id/line"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="@color/md_grey_500" />
+                android:background="@color/md_grey_500"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 
