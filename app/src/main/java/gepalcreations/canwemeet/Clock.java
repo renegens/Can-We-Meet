@@ -1,10 +1,5 @@
 package gepalcreations.canwemeet;
 
-import android.util.Log;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -33,7 +28,5 @@ public class Clock {
 		return tzCurrent.getRawOffset() / 3600000;//seconds per day
 
 	}
-
-
 
 }

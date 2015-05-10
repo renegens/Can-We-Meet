@@ -30,12 +30,15 @@ import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 public class MainActivity extends Activity {
@@ -81,7 +84,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
         int currentMinutes = mClock.getMinutes();
@@ -103,17 +105,6 @@ public class MainActivity extends Activity {
 		Log.i("Difference", String.valueOf(timeZoneDifference));
 		Log.i("Date time from yoda", String.valueOf(dateTime));
 		Log.i("Date time zone for id", String.valueOf(dtLondon));
-
-
-
-
-
-
-
-
-
-
-
 
         //Log.e("hours", String.valueOf(currentHours));
         //int height = getScreenHeight() - getDensityPixelToRemove(context);
@@ -144,6 +135,8 @@ public class MainActivity extends Activity {
         measures = new Measures();
 
         setPaddingToTextViews();
+		Set<String> zoneIds = DateTimeZone.getAvailableIDs();
+		DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("ZZ");
 
         loadImagesFromXML(timeZoneDifference);
 
@@ -158,7 +151,7 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
-		ComponentName cn = new ComponentName(this, SearchActivity.class);
+		ComponentName cn = new ComponentName(this, TimeZoneAdapter.class);
 
 		// Get the SearchView and set the searchable configuration
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
