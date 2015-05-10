@@ -9,4 +9,5 @@
 
 	android:searchSuggestSelection=" ? "
 	android:searchSuggestIntentAction="android.intent.action.VIEW"
-	android:voiceSearchMode="showVoiceSearchButton"/>
+
+	android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"/>

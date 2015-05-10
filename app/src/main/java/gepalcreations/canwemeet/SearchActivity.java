@@ -3,84 +3,89 @@ package gepalcreations.canwemeet;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 
 public class SearchActivity extends Activity {
 
-	RecyclerView mRecyclerView;
-	private TimeZoneAdapter mTimeZoneAdapter;
-	private LayoutInflater inflater;
-	private LinearLayout rowLinearLayout;
+	DatabaseTable db = new DatabaseTable(this);
+	private TextView mTextView;
+	private ListView mListView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search_list);
-
+		mTextView = (TextView) findViewById(R.id.text);
+		mListView = (ListView) findViewById(R.id.list);
 		// Get the intent, verify the action and get the query
 		Intent intent = getIntent();
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
-			getDoMySearch(query);
+			Cursor c = db.getWordMatches(query, null);
+			//process Cursor and display results
+			showResults(query);
 			Log.i ("Query Value", String.valueOf(query));
 		}
 
 	}
 
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		View layout = inflater.inflate(R.layout.activity_search_list, container, false);
-		mRecyclerView =(RecyclerView) (layout.findViewById(R.id.recycle_list));
-		mTimeZoneAdapter = new TimeZoneAdapter(getApplicationContext(),getData());
-		mRecyclerView.setAdapter(mTimeZoneAdapter);
-		mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+	/**
+	 * Searches the dictionary and displays results for the given query.
+	 * @param query The search query
+	 */
+	private void showResults(String query) {
 
+		Cursor cursor = getContentResolver().query(DictionaryProvider.CONTENT_URI, null, null,
+				new String[]{query}, null);
 
-		return layout;
-	}
+		if (cursor == null || cursor.getCount() > 0) {
+			// There are no results
+			mTextView.setText(getString(R.string.no_results, new Object[] {query}));
+		} else {
+			// Display the number of results
+			int count = cursor.getCount();
+			String countString = getResources().getQuantityString(R.plurals.search_results,
+					count, new Object[] {count, query});
+			mTextView.setText(countString);
 
-	public static List<JodaZones> getData(){
+			// Specify the columns we want to display in the result
+			String[] from = new String[] { DatabaseTable.COL_CITY,
+					 };
 
-		List<JodaZones> jodaZones = new ArrayList<>();
-		String [] city = {"Berlin, Athens, New York, London, Tokyo"};
-		for (int i = 0; i<city.length; i++){
-			JodaZones current = new JodaZones();
-			current.city = city [i];
-			jodaZones.add(current);
+			// Specify the corresponding layout elements where we want the columns to go
+			int[] to = new int[] { R.id.word,
+					};
+
+			// Create a simple cursor adapter for the definitions and apply them to the ListView
+			SimpleCursorAdapter words = new SimpleCursorAdapter(this,
+					R.layout.result, cursor, from, to, 1);
+			mListView.setAdapter(words);
+
+			// Define the on-click listener for the list items
+			mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					// Build the Intent used to open WordActivity with a specific word Uri
+					Intent wordIntent = new Intent(getApplicationContext(), MainActivity.class);
+					Uri data = Uri.withAppendedPath(DictionaryProvider.CONTENT_URI,
+							String.valueOf(id));
+					wordIntent.setData(data);
+					startActivity(wordIntent);
+				}
+			});
 		}
-
-		return jodaZones;
 	}
 
-	private void getDoMySearch(String query) {
-		Set <String> zoneIds = DateTimeZone.getAvailableIDs();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("ZZ");
 
-
-		List <String> zoneIDtoList = new ArrayList<String>(zoneIds);
-		Collections.sort(zoneIDtoList);
-
-		for(String zoneId:zoneIDtoList) {
-			Log.i ("Zones", zoneId);
-		}
-		//	System.out.println("("+dateTimeFormatter.withZone(DateTimeZone.forID(zoneId)).print(0) +") "+zoneId+", "+DateTimeZone.forID(zoneId).getName(DateTimeUtils.currentTimeMillis()));
-		//}
-	}
 
 }
