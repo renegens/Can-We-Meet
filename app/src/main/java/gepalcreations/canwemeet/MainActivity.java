@@ -343,7 +343,7 @@ public class MainActivity extends Activity {
         wholeLinear.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams wholeLinearParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 4.0f);
         wholeLinear.setLayoutParams(wholeLinearParams);
-        // Isws prepei na mpei sto telos
+
         timeLinearLayout.addView(wholeLinear);
 
         TextView currentTime = (TextView) findViewById(R.id.current_city);
