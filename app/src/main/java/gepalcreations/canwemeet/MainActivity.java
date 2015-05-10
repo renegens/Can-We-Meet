@@ -151,7 +151,7 @@ public class MainActivity extends Activity {
         Set<String> zoneIds = DateTimeZone.getAvailableIDs();
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("ZZ");
 
-        loadImagesFromXML(timeZoneDifference, currentHours);
+        loadImagesFromXML(8, currentHours);
 
         // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
         //float timeCalculation = getTimeCalculation(currentHours, currentMinutes, measures.getLeftLinearHeight());
