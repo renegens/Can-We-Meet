@@ -11,7 +11,7 @@
         android:theme="@android:style/Theme.Material">
 
 		<provider android:name="gepalcreations.canwemeet.DictionaryProvider"
-				  android:authorities="gepalcreations.canwemeet.dictionaryprovider">
+				  android:authorities="gepalcreations.canwemeet.DictionaryProvider">
 		</provider>
         <activity
             android:name=".MainActivity"

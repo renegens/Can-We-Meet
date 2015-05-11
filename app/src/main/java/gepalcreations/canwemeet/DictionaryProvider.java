@@ -15,8 +15,8 @@ import android.provider.BaseColumns;
 public class DictionaryProvider extends ContentProvider {
     String TAG = "DictionaryProvider";
 
-    public static String AUTHORITY = "gepalcreations.canwemeet.dictionaryprovider";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/CITY");
+    public static String AUTHORITY = "gepalcreations.canwemeet.DictionaryProvider";
+    public static final Uri CONTENT_URI = Uri.parse("content://gepalcreations.canwemeet/*"); /*+ AUTHORITY + "/FTS");*/
 
     // MIME types used for searching words or looking up a single definition
     public static final String WORDS_MIME_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
