@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -60,12 +61,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imm  = (InputMethodManager) getSystemService(
+        imm = (InputMethodManager) getSystemService(
                 Context.INPUT_METHOD_SERVICE);
 
 
         //Get the appcompat toolbar
-        toolbar = (Toolbar)findViewById(R.id.app_bar);
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
             setSupportActionBar(toolbar);
@@ -77,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         //actionBar.setDisplayShowCustomEnabled(true);
         //actionBar.setDisplayShowTitleEnabled(true);
         //actionBar.setIcon(R.drawable.ic_search);
-
 
 
         //Getting time from clock and timezone animation class in minutes
@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
       /* Inflate the menu; this adds items to the action bar if
@@ -372,10 +373,24 @@ public class MainActivity extends AppCompatActivity {
         ImageView work = new ImageView(this);
         ImageView home = new ImageView(this);
 
-        Drawable sleepImage = getResources().getDrawable(R.drawable.ic_sleep, getTheme());
-        Drawable coffeeImage = getResources().getDrawable(R.drawable.ic_coffee, getTheme());
-        Drawable workImage = getResources().getDrawable(R.drawable.ic_work, getTheme());
-        Drawable homeImage = getResources().getDrawable(R.drawable.ic_home, getTheme());
+        Drawable sleepImage;
+        Drawable coffeeImage;
+        Drawable workImage;
+        Drawable homeImage;
+
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 21) {
+            sleepImage = getResources().getDrawable(R.drawable.ic_sleep, getTheme());
+            coffeeImage = getResources().getDrawable(R.drawable.ic_coffee, getTheme());
+            workImage = getResources().getDrawable(R.drawable.ic_work, getTheme());
+            homeImage = getResources().getDrawable(R.drawable.ic_home, getTheme());
+        } else {
+            sleepImage = getResources().getDrawable(R.drawable.ic_sleep);
+            coffeeImage = getResources().getDrawable(R.drawable.ic_coffee);
+            workImage = getResources().getDrawable(R.drawable.ic_work);
+            homeImage = getResources().getDrawable(R.drawable.ic_home);
+        }
+
 
         sleepParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         sleepParams.addRule(RelativeLayout.CENTER_VERTICAL);
