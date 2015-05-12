@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
 
 
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setIcon(R.drawable.ic_search);
@@ -110,9 +110,15 @@ public class MainActivity extends Activity {
         textView.setAdapter(adapter);
 
         textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
                 String selection = (String) parent.getItemAtPosition(position);
-                Log.i("Value of selection", String.valueOf(selection));
+                timeCalculator(selection);
+                Clock mClock = new Clock();
+
+                int currentHours = mClock.getHours();
+                int timeZoneDifference = timeCalculator(selection);
+                loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
 
             }
@@ -125,15 +131,16 @@ public class MainActivity extends Activity {
         int currentTimeZone = mClock.getTimeZone();
 
         //Kapou to gamisa kai einai sinexei null to selection. Gamiseto gia ayrio
-        String selection = "";
+        /*String selection = "";
         if (selection == null)
-            selection = "Europe/Berlin";
+            selection = "Europe/Berlin";*/
+        //gejava.util.Date date = new java.util.Date(System.currentTimeMillis());
 
+        DateTimeZone dtz = DateTimeZone.getDefault();
+        String selection = dtz.getID();
+        Log.i("Value of selection", String.valueOf(selection));
 
-        int timeZoneDifference = returnInput(selection);
-
-
-
+        int timeZoneDifference = timeCalculator(selection);
 
         //Log.e("hours", String.valueOf(currentHours));
         //int height = getScreenHeight() - getDensityPixelToRemove(context);
@@ -158,7 +165,7 @@ public class MainActivity extends Activity {
 
         measures = new Measures();
         setPaddingToTextViews(currentHours);
-        loadImagesFromXML(timeZoneDifference, currentHours);
+        loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
         // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
         //float timeCalculation = getTimeCalculation(currentHours, currentMinutes, measures.getLeftLinearHeight());
@@ -167,7 +174,7 @@ public class MainActivity extends Activity {
 
     }
 
-    private int returnInput(String selection) {
+    private int timeCalculator(String selection) {
         // get current moment in default time zone
         DateTime dt = new DateTime();
         // translate to local time
@@ -190,7 +197,7 @@ public class MainActivity extends Activity {
     ViewHolder holder;
 
 
-    public void loadImagesFromXML(int timeZone, int ct) {
+    public void loadImagesFromXML(int timeZone, int ct, String selection) {
         // checking and correcting for negative value
         if (timeZone < 0) {
             timeZone = timeZone * (-1);
@@ -296,6 +303,7 @@ public class MainActivity extends Activity {
         timeLinearLayout.addView(wholeLinear);
 
         TextView currentTime = (TextView) findViewById(R.id.current_city);
+        currentTime.setText(selection);
         currentTime.setPadding(0, measures.getPadding() + dpToPx(1), 0, measures.getPadding());
 
         for (int i = 0; i < 25; i++) {
