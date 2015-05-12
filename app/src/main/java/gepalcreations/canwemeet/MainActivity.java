@@ -1,13 +1,13 @@
 package gepalcreations.canwemeet;
 
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -15,12 +15,13 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,13 +37,14 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private LinearLayout timeLinearLayout;
     private View line;
     Context context = this;
     static int activityHeight = 0;
     private Measures measures;
+    private Toolbar toolbar;
 
 
     private enum dayPart {
@@ -58,142 +60,23 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CityTable mCityTable = new CityTable();
-        String[] cities = mCityTable.tableReturn();
 
 
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setIcon(R.drawable.ic_search);
-
-        LayoutInflater inflator = (LayoutInflater) this
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflator.inflate(R.layout.actionbar, null);
-
-        actionBar.setCustomView(v);
-
-        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-        //        android.R.layout.simple_dropdown_item_1line, cities);
-
-        final ArrayList<String> searchArrayList = new ArrayList<String>(Arrays.asList(cities));
-
-        AutoCompleteAdapter adapter = new AutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line, android.R.id.text1, searchArrayList);
-
-        final AutoCompleteTextView textView = (AutoCompleteTextView) v
-                .findViewById(R.id.editText1);
-        textView.setAdapter(adapter);
-
-        textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
-                String selection = (String) parent.getItemAtPosition(position);
-
-                timeCalculator(selection);
-                Clock mClock = new Clock();
-                int currentHours = mClock.getHours();
-                int timeZoneDifference = timeCalculator(selection);
-
-                textView.setText("");
-
-                timeLinearLayout.removeAllViews();
-
-                loadImagesFromXML(timeZoneDifference, currentHours, selection);
-
-            }
-        });
-
-        textView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-
-                    InputMethodManager imm = (InputMethodManager) getSystemService(
-                            Context.INPUT_METHOD_SERVICE);
-
-                    if (!textView.getText().toString().equals("")) {
-
-                        String selection = textView.getText().toString();
-
-                        StringBuffer res = new StringBuffer();
-
-                        String[] strArr = selection.split(" ");
-                        for (String str : strArr) {
-                            char[] stringArray = str.trim().toCharArray();
-                            stringArray[0] = Character.toUpperCase(stringArray[0]);
-                            str = new String(stringArray);
-
-                            res.append(str).append(" ");
-                        }
-
-                        if (res.toString().contains("Of")) {
-                            String s1 = res.toString().substring(res.toString().indexOf("Of") + 1);
-                            String s2 = res.toString().substring(0, res.toString().indexOf("Of"));
-                            res = new StringBuffer(s2 + "o" + s1.trim());
-                        } else if (res.toString().contains("Es")) {
-                            String s1 = res.toString().substring(res.toString().indexOf("Es") + 1);
-                            String s2 = res.toString().substring(0, res.toString().indexOf("Es"));
-                            res = new StringBuffer(s2 + "e" + s1.trim());
-                        } else if (res.toString().contains("Au")) {
-                            String s1 = res.toString().substring(res.toString().indexOf("Au") + 1);
-                            String s2 = res.toString().substring(0, res.toString().indexOf("Au"));
-                            res = new StringBuffer(s2 + "a" + s1.trim());
-
-                            Log.i("s1", s1);
-                            Log.i("s2", s2);
-                        }
-
-                        String currentSelection = null;
-                        int counter = 0;
-                        selection = res.toString();
-                        selection = selection.trim().toString().replaceAll(" ", "_");
-
-                        for (String city : searchArrayList) {
-                            if (city.contains(selection)) {
-                                currentSelection = city;
-                                counter++;
-                            }
-                        }
-
-                        if (counter == 0) {
-                            selection = selection.trim().toString().replaceAll("_", "-");
-                            for (String city : searchArrayList) {
-                                if (city.contains(selection)) {
-                                    currentSelection = city;
-                                    counter++;
-                                }
-                            }
-                        }
-
-                        selection = currentSelection;
+        //Get the appcompat toolbar
+        toolbar = (Toolbar)findViewById(R.id.app_bar);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.app_name);
+            setSupportActionBar(toolbar);
+        }
 
 
-                        if (counter > 0) {
-                            imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
-                            timeCalculator(selection);
-                            Clock mClock = new Clock();
-                            int currentHours = mClock.getHours();
+        //ActionBar actionBar = getActionBar();
+        //ActionBar.setDisplayHomeAsUpEnabled(false);
+        //actionBar.setDisplayShowCustomEnabled(true);
+        //actionBar.setDisplayShowTitleEnabled(true);
+        //actionBar.setIcon(R.drawable.ic_search);
 
-                            int timeZoneDifference = timeCalculator(selection);
 
-                            textView.setText("");
-
-                            timeLinearLayout.removeAllViews();
-
-                            loadImagesFromXML(timeZoneDifference, currentHours, selection);
-                        } else {
-                            textView.setText("");
-                            imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
-                            Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
-                        Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                return false;
-            }
-        });
 
         //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
@@ -244,6 +127,157 @@ public class MainActivity extends Activity {
         //line.setTranslationY(timeCalculation);
 
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+      /* Inflate the menu; this adds items to the action bar if
+      it is present */
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_search:
+                //Initialize Table
+                CityTable mCityTable = new CityTable();
+                String[] cities = mCityTable.tableReturn();
+                LayoutInflater inflator = (LayoutInflater) this
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View v = inflator.inflate(R.layout.actionbar, null);
+
+                //actionBar.setCustomView(v);
+
+                getSupportActionBar().setDisplayShowCustomEnabled(true);
+                getSupportActionBar().setCustomView(v);
+
+                //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                //        android.R.layout.simple_dropdown_item_1line, cities);
+
+                final ArrayList<String> searchArrayList = new ArrayList<String>(Arrays.asList(cities));
+
+                AutoCompleteAdapter adapter = new AutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line, android.R.id.text1, searchArrayList);
+
+                final AutoCompleteTextView textView = (AutoCompleteTextView) v
+                        .findViewById(R.id.editText1);
+                textView.setAdapter(adapter);
+
+                textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
+                        String selection = (String) parent.getItemAtPosition(position);
+
+                        timeCalculator(selection);
+                        Clock mClock = new Clock();
+                        int currentHours = mClock.getHours();
+                        int timeZoneDifference = timeCalculator(selection);
+
+                        textView.setText("");
+
+                        timeLinearLayout.removeAllViews();
+
+                        loadImagesFromXML(timeZoneDifference, currentHours, selection);
+
+                    }
+                });
+
+                textView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+
+                            InputMethodManager imm = (InputMethodManager) getSystemService(
+                                    Context.INPUT_METHOD_SERVICE);
+
+                            if (!textView.getText().toString().equals("")) {
+
+                                String selection = textView.getText().toString();
+
+                                StringBuffer res = new StringBuffer();
+
+                                String[] strArr = selection.split(" ");
+                                for (String str : strArr) {
+                                    char[] stringArray = str.trim().toCharArray();
+                                    stringArray[0] = Character.toUpperCase(stringArray[0]);
+                                    str = new String(stringArray);
+
+                                    res.append(str).append(" ");
+                                }
+
+                                if (res.toString().contains("Of")) {
+                                    String s1 = res.toString().substring(res.toString().indexOf("Of") + 1);
+                                    String s2 = res.toString().substring(0, res.toString().indexOf("Of"));
+                                    res = new StringBuffer(s2 + "o" + s1.trim());
+                                } else if (res.toString().contains("Es")) {
+                                    String s1 = res.toString().substring(res.toString().indexOf("Es") + 1);
+                                    String s2 = res.toString().substring(0, res.toString().indexOf("Es"));
+                                    res = new StringBuffer(s2 + "e" + s1.trim());
+                                } else if (res.toString().contains("Au")) {
+                                    String s1 = res.toString().substring(res.toString().indexOf("Au") + 1);
+                                    String s2 = res.toString().substring(0, res.toString().indexOf("Au"));
+                                    res = new StringBuffer(s2 + "a" + s1.trim());
+
+                                    Log.i("s1", s1);
+                                    Log.i("s2", s2);
+                                }
+
+                                String currentSelection = null;
+                                int counter = 0;
+                                selection = res.toString();
+                                selection = selection.trim().toString().replaceAll(" ", "_");
+
+                                for (String city : searchArrayList) {
+                                    if (city.contains(selection)) {
+                                        currentSelection = city;
+                                        counter++;
+                                    }
+                                }
+
+                                if (counter == 0) {
+                                    selection = selection.trim().toString().replaceAll("_", "-");
+                                    for (String city : searchArrayList) {
+                                        if (city.contains(selection)) {
+                                            currentSelection = city;
+                                            counter++;
+                                        }
+                                    }
+                                }
+
+                                selection = currentSelection;
+
+
+                                if (counter > 0) {
+                                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                                    timeCalculator(selection);
+                                    Clock mClock = new Clock();
+                                    int currentHours = mClock.getHours();
+
+                                    int timeZoneDifference = timeCalculator(selection);
+
+                                    textView.setText("");
+
+                                    timeLinearLayout.removeAllViews();
+
+                                    loadImagesFromXML(timeZoneDifference, currentHours, selection);
+                                } else {
+                                    textView.setText("");
+                                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                                    Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                                Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        return false;
+                    }
+                });
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private int timeCalculator(String selection) {
