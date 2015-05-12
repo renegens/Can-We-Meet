@@ -437,7 +437,7 @@
                         android:background="@color/md_black_1000"
                         android:gravity="center"
                         android:paddingRight="10dp"
-                        android:text="New York"
+
                         android:textAlignment="gravity"
                         android:textColor="@color/md_white_1000"
                         android:textSize="20sp" />

@@ -8,14 +8,7 @@
 		  android:title="@string/search_hint"
 		  android:showAsAction="ifRoom"
 
-		  android:actionViewClass="android.widget.SearchView"/>
+		  app:actionViewClass="android.ArrayAdapterSearchView"/>
 
-	<item android:id="@+id/capture"
-		  android:title="@string/capture"
-
-		  android:icon="@drawable/ic_home"
-		  android:showAsAction="ifRoom"
-
-		  />
 
 </menu>

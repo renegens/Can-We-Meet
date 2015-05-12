@@ -1,47 +1,33 @@
 package gepalcreations.canwemeet;
 
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 public class MainActivity extends Activity {
@@ -50,8 +36,11 @@ public class MainActivity extends Activity {
     private View line;
     Context context = this;
     static int activityHeight = 0;
-    String searchedCity = "New York";
+
     private Measures measures;
+
+
+
 
     private enum dayPart {
         DAY, NOON, AFTERNOON, NIGHT
@@ -77,7 +66,7 @@ public class MainActivity extends Activity {
     // East Saskatchewan -> Canada/East-Saskatchewan
     // ^-- Canada/East-Saskatchewan, Canada/Saskatchewan
 
-    private static final String[] cities = new String[]{
+    /*private static final String[] cities = new String[]{
             "Apia", "Midway", "Niue", "Pago Pago", "Samoa", "Adak", "Atka", "Aleutian",
             "Fakaofo", "Honolulu", "Hawaii", "Johnston", "Rarotonga", "Tahiti", "Marquesas",
             "Anchorage", "Alaska", "Juneau", "Nome", "Yakutat", "Gambier", "Dawson", "Los Angeles",
@@ -89,34 +78,69 @@ public class MainActivity extends Activity {
             "Knox (Indiana)", "Knox IN", "Starke (Indiana)", "Tell City (Indiana)", "Managua", "Matamoros", "Menominee",
             "Merida", "Mexico City", "Monterrey", "New Salem (North Dakota)", "Rainy River", "Rankin Inlet", "Regina",
             "East Saskatchewan", "Saskatchewan"
-    };
+    };*/
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        CityTable mCityTable = new CityTable();
+        String [] cities = mCityTable.tableReturn();
+
+
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setIcon(R.drawable.ic_search);
+
+        LayoutInflater inflator = (LayoutInflater) this
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inflator.inflate(R.layout.actionbar, null);
+
+        actionBar.setCustomView(v);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, cities);
+        AutoCompleteTextView textView = (AutoCompleteTextView) v
+                .findViewById(R.id.editText1);
+        textView.setAdapter(adapter);
+
+        textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
+                String selection = (String) parent.getItemAtPosition(position);
+                timeCalculator(selection);
+                Clock mClock = new Clock();
+
+                int currentHours = mClock.getHours();
+                int timeZoneDifference = timeCalculator(selection);
+                loadImagesFromXML(timeZoneDifference, currentHours, selection);
+
+
+            }
+        });
+
         //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
-        int currentMinutes = mClock.getMinutes();
+        //int currentMinutes = mClock.getMinutes();
         int currentHours = mClock.getHours();
         int currentTimeZone = mClock.getTimeZone();
 
-        // get current moment in default time zone
+        //Kapou to gamisa kai einai sinexei null to selection. Gamiseto gia ayrio
+        /*String selection = "";
+        if (selection == null)
+            selection = "Europe/Berlin";*/
+        //gejava.util.Date date = new java.util.Date(System.currentTimeMillis());
 
-        DateTime dt = new DateTime();
-        // translate to London local time
-        String searchTime = "Europe/Berlin";
-        DateTime dtLondon = dt.withZone(DateTimeZone.forID(searchTime));
+        DateTimeZone dtz = DateTimeZone.getDefault();
+        String selection = dtz.getID();
+        Log.i("Value of selection", String.valueOf(selection));
 
-        java.util.Date date = new java.util.Date(System.currentTimeMillis());
-        DateTimeZone dtz = DateTimeZone.getDefault();// Gets the default time zone.
-        DateTime dateTime = new DateTime(date.getTime(), dtz);
-        int timeZoneDifference = dtLondon.getHourOfDay() - dateTime.getHourOfDay();
-
-        Log.i("Difference", String.valueOf(timeZoneDifference));
-        Log.i("Date time from yoda", String.valueOf(dateTime));
-        Log.i("Date time zone for id", String.valueOf(dtLondon));
+        int timeZoneDifference = timeCalculator(selection);
 
         //Log.e("hours", String.valueOf(currentHours));
         //int height = getScreenHeight() - getDensityPixelToRemove(context);
@@ -131,27 +155,17 @@ public class MainActivity extends Activity {
         //Loading Line
         //line = findViewById(R.id.line);
 
-        File screenShotsDir = new File(Environment.getExternalStorageDirectory(), "CanWeMeet");
+        //File screenShotsDir = new File(Environment.getExternalStorageDirectory(), "CanWeMeet");
 
-        if (!screenShotsDir.exists()) {
-            screenShotsDir.mkdirs();
-        }
+        //if (!screenShotsDir.exists()) {
+        //    screenShotsDir.mkdirs();
+        //}
 
 
-        //checking if we are in the same time zone to do other logic.
-        int timeZoneCheck = compareSameTimeZone(timeZoneDifference, currentTimeZone);
-        if (timeZoneCheck == 1) {
-            timeZoneDifference = 0;
-        }
 
         measures = new Measures();
-
         setPaddingToTextViews(currentHours);
-
-        Set<String> zoneIds = DateTimeZone.getAvailableIDs();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("ZZ");
-
-        loadImagesFromXML(8, currentHours);
+        loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
         // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
         //float timeCalculation = getTimeCalculation(currentHours, currentMinutes, measures.getLeftLinearHeight());
@@ -160,88 +174,30 @@ public class MainActivity extends Activity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
-        ComponentName cn = new ComponentName(this, SearchActivity.class);
+    private int timeCalculator(String selection) {
+        // get current moment in default time zone
+        DateTime dt = new DateTime();
+        // translate to local time
 
-        // Get the SearchView and set the searchable configuration
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-        // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn));
-        searchView.setSubmitButtonEnabled(true);
-        searchView.setQueryRefinementEnabled(true);
-        //searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        DateTime dtLondon = dt.withZone(DateTimeZone.forID(selection));
 
-        return true;
+        java.util.Date date = new java.util.Date(System.currentTimeMillis());
+        DateTimeZone dtz = DateTimeZone.getDefault();// Gets the default time zone.
+        DateTime dateTime = new DateTime(date.getTime(), dtz);
+        int timeZoneDifference = dtLondon.getHourOfDay() - dateTime.getHourOfDay();
 
+        Log.i("Difference", String.valueOf(timeZoneDifference));
+        Log.i("Date time from yoda", String.valueOf(dateTime));
+        Log.i("Date time zone for id", String.valueOf(dtLondon));
 
+        return timeZoneDifference;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case R.id.menu_search:
-                onSearchRequested();
-                return true;
-            case R.id.capture:
-//                line.setVisibility(View.GONE);
-                LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-                RelativeLayout root = (RelativeLayout) inflater.inflate(R.layout.activity_main, null);
-                root.setDrawingCacheEnabled(true);
-
-                Bitmap bmp = getBitmapFromView(this.getWindow().getDecorView().findViewById(R.id.main_relative).getRootView());
-
-                URI uri = storePrintFile(bmp);
-
-                Toast.makeText(getApplicationContext(), "Image Saved at " + uri.getPath(), Toast.LENGTH_SHORT).show();
-                //               line.setVisibility(View.VISIBLE);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public Bitmap getBitmapFromView(View v) {
-        v.setLayoutParams(new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT));
-        v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
-        Bitmap b = Bitmap.createBitmap(v.getMeasuredWidth(),
-                v.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-
-        Canvas c = new Canvas(b);
-        v.draw(c);
-        return b;
-    }
-
-    public URI storePrintFile(Bitmap bitmapToStore) {
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        String path = Environment.getExternalStorageDirectory() + File.separator + "CanWeMeet" + File.separator;
-        File file = new File(path);
-        String current = searchedCity + ".jpg";//uniqueId.replace(" ", "-").replace(":", "-") + ".jpeg";
-        File mypath = new File(file, current);
-        try {
-            FileOutputStream out = new FileOutputStream(mypath);
-            bitmapToStore.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return mypath.toURI();
-    }
 
     ViewHolder holder;
 
-    public void loadImagesFromXML(int timeZone, int ct) {
+
+    public void loadImagesFromXML(int timeZone, int ct, String selection) {
         // checking and correcting for negative value
         if (timeZone < 0) {
             timeZone = timeZone * (-1);
@@ -347,6 +303,7 @@ public class MainActivity extends Activity {
         timeLinearLayout.addView(wholeLinear);
 
         TextView currentTime = (TextView) findViewById(R.id.current_city);
+        currentTime.setText(selection);
         currentTime.setPadding(0, measures.getPadding() + dpToPx(1), 0, measures.getPadding());
 
         for (int i = 0; i < 25; i++) {
@@ -365,7 +322,7 @@ public class MainActivity extends Activity {
                 holder.hour = (TextView) v.findViewById(R.id.hours);
 
                 holder.hour.setText(String.valueOf(indexes[i]));
-                if(indexes[i] == (ct + timeZone)){
+                if (indexes[i] == (ct + timeZone)) {
                     holder.hour.setTypeface(null, Typeface.BOLD_ITALIC);
                 }
                 holder.hour.measure(widthMeasureSpec, heightMeasureSpec);
@@ -640,7 +597,7 @@ public class MainActivity extends Activity {
             // Math.floor -> px 4.5 to kanei 4
             // Math.ceil -> px 4.5 to kanei 5
 
-            if(t.getText().toString().equals(String.valueOf(currentHours)))
+            if (t.getText().toString().equals(String.valueOf(currentHours)))
                 t.setTypeface(null, Typeface.BOLD_ITALIC);
 
             t.setPadding(0, (int) Math.ceil(padding), dpToPx(10), (int) Math.ceil(padding));
