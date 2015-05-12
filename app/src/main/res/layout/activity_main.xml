@@ -429,18 +429,6 @@
                     android:orientation="vertical"
                     android:weightSum="25">
 
-                    <TextView
-                        android:id="@+id/current_city"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@color/md_black_1000"
-                        android:gravity="center"
-                        android:paddingRight="10dp"
-
-                        android:textAlignment="gravity"
-                        android:textColor="@color/md_white_1000"
-                        android:textSize="20sp" />
 
                 </LinearLayout>
 

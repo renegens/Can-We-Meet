@@ -12,6 +12,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -36,10 +38,7 @@ public class MainActivity extends Activity {
     private View line;
     Context context = this;
     static int activityHeight = 0;
-
     private Measures measures;
-
-
 
 
     private enum dayPart {
@@ -50,45 +49,13 @@ public class MainActivity extends Activity {
         PURPLE, TEAL, AMBER, BROWN
     }
 
-
-    // Pacific (US) -> US/Pacific
-    // Pacific New (US) -> US/Pacific-New
-    // Pacific (Canada) -> Canada/Pacific
-    // "Shiprock, Navajo"
-    // Mountain (US) -> US/Mountain
-    // Mountain (Canada) -> Canada/Mountain
-    // Knox (Indiana) -> America/Indiana/Knox
-    // Knox IN -> America/Knox_IN
-    // Starke (Indiana) -> US/Indiana-Starke
-    // ^--"America/Knox_IN, US/Indiana-Starke"
-    // Tell City (Indiana) -> America/Indiana/Tell_City
-    // New Salem (North Dakota) -> America/North_Dakota/New_Salem
-    // East Saskatchewan -> Canada/East-Saskatchewan
-    // ^-- Canada/East-Saskatchewan, Canada/Saskatchewan
-
-    /*private static final String[] cities = new String[]{
-            "Apia", "Midway", "Niue", "Pago Pago", "Samoa", "Adak", "Atka", "Aleutian",
-            "Fakaofo", "Honolulu", "Hawaii", "Johnston", "Rarotonga", "Tahiti", "Marquesas",
-            "Anchorage", "Alaska", "Juneau", "Nome", "Yakutat", "Gambier", "Dawson", "Los Angeles",
-            "Pacific (US)", "Pacific New (US)", "Santa Isabel", "Tijuana", "Ensenada", "BajaNorte", "Vancouver",
-            "Pacific (Canada)", "Whitehorse", "Yukon", "Pitcairn", "Boise", "Cambridge Bay", "Chihuahua",
-            "Dawson Creek", "Denver", "Shiprock", "Navajo", "Mountain (US)", "Edmonton", "Mountain (Canada)",
-            "Hermosillo", "Inuvik", "Mazatlan", "BajaSur", "Ojinaga", "Phoenix", "Arizona", "Yellowknife",
-            "Bahia Banderas", "Belize", "Cancun", "Chicago", "Central", "Costa Rica", "El Salvador", "Guatemala",
-            "Knox (Indiana)", "Knox IN", "Starke (Indiana)", "Tell City (Indiana)", "Managua", "Matamoros", "Menominee",
-            "Merida", "Mexico City", "Monterrey", "New Salem (North Dakota)", "Rainy River", "Rankin Inlet", "Regina",
-            "East Saskatchewan", "Saskatchewan"
-    };*/
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         CityTable mCityTable = new CityTable();
-        String [] cities = mCityTable.tableReturn();
+        String[] cities = mCityTable.tableReturn();
 
 
         ActionBar actionBar = getActionBar();
@@ -103,9 +70,14 @@ public class MainActivity extends Activity {
 
         actionBar.setCustomView(v);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, cities);
-        AutoCompleteTextView textView = (AutoCompleteTextView) v
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        //        android.R.layout.simple_dropdown_item_1line, cities);
+
+        ArrayList<String> searchArrayList= new ArrayList<String>(Arrays.asList(cities));
+
+        AutoCompleteAdapter adapter = new AutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line, android.R.id.text1, searchArrayList);
+
+        final AutoCompleteTextView textView = (AutoCompleteTextView) v
                 .findViewById(R.id.editText1);
         textView.setAdapter(adapter);
 
@@ -113,11 +85,16 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
                 String selection = (String) parent.getItemAtPosition(position);
+
                 timeCalculator(selection);
                 Clock mClock = new Clock();
-
                 int currentHours = mClock.getHours();
                 int timeZoneDifference = timeCalculator(selection);
+
+                textView.setText("");
+
+                timeLinearLayout.removeAllViews();
+
                 loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
 
@@ -162,9 +139,10 @@ public class MainActivity extends Activity {
         //}
 
 
-
         measures = new Measures();
+
         setPaddingToTextViews(currentHours);
+
         loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
         // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
@@ -202,7 +180,6 @@ public class MainActivity extends Activity {
         if (timeZone < 0) {
             timeZone = timeZone * (-1);
         }
-
         LinearLayout.LayoutParams firstMorningRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
         LinearLayout.LayoutParams firstNoonRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
         LinearLayout.LayoutParams firstAfternoonRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
@@ -213,6 +190,7 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams secondAfternoonRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
         LinearLayout.LayoutParams secondNightRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
 
+        LinearLayout.LayoutParams cityParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
 
         RelativeLayout.LayoutParams firstMorningLinearParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams firstNoonLinearParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -302,9 +280,19 @@ public class MainActivity extends Activity {
 
         timeLinearLayout.addView(wholeLinear);
 
-        TextView currentTime = (TextView) findViewById(R.id.current_city);
+        TextView currentTime = new TextView(this);
+        selection = selection.substring(selection.lastIndexOf('/') + 1);
+        selection = selection.replaceAll("_", " ");
         currentTime.setText(selection);
-        currentTime.setPadding(0, measures.getPadding() + dpToPx(1), 0, measures.getPadding());
+        currentTime.setBackgroundColor(getResources().getColor(R.color.md_black_1000));
+        currentTime.setGravity(Gravity.CENTER);
+        currentTime.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
+        currentTime.setTextColor(getResources().getColor(R.color.md_white_1000));
+        currentTime.setTextSize(20);
+        currentTime.setPadding(0, measures.getPadding(), 0, measures.getPadding() + +dpToPx(1));
+        currentTime.requestFocus();
+
+        wholeLinear.addView(currentTime, cityParams);
 
         for (int i = 0; i < 25; i++) {
             indexes[i] = ((i + 1) + timeZone) % 25;
