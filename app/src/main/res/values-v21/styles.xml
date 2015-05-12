@@ -3,7 +3,7 @@
     <style name="AppTheme" parent="AppTheme.Base">
         <item name="android:colorPrimary">@color/md_indigo_500</item>
         <item name="android:colorPrimaryDark">@color/md_indigo_500</item>
-        <item name="android:colorAccent">@color/md_pink_500</item>
+        <item name="android:colorAccent">@color/md_white_1000</item>
 
     </style>
 </resources>
