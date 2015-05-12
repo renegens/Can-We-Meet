@@ -13,9 +13,12 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -23,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -73,7 +77,7 @@ public class MainActivity extends Activity {
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
         //        android.R.layout.simple_dropdown_item_1line, cities);
 
-        ArrayList<String> searchArrayList= new ArrayList<String>(Arrays.asList(cities));
+        final ArrayList<String> searchArrayList = new ArrayList<String>(Arrays.asList(cities));
 
         AutoCompleteAdapter adapter = new AutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line, android.R.id.text1, searchArrayList);
 
@@ -97,7 +101,97 @@ public class MainActivity extends Activity {
 
                 loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
+            }
+        });
 
+        textView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+
+                    InputMethodManager imm = (InputMethodManager) getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+
+                    if (!textView.getText().toString().equals("")) {
+
+                        String selection = textView.getText().toString();
+
+                        StringBuffer res = new StringBuffer();
+
+                        String[] strArr = selection.split(" ");
+                        for (String str : strArr) {
+                            char[] stringArray = str.trim().toCharArray();
+                            stringArray[0] = Character.toUpperCase(stringArray[0]);
+                            str = new String(stringArray);
+
+                            res.append(str).append(" ");
+                        }
+
+                        if (res.toString().contains("Of")) {
+                            String s1 = res.toString().substring(res.toString().indexOf("Of") + 1);
+                            String s2 = res.toString().substring(0, res.toString().indexOf("Of"));
+                            res = new StringBuffer(s2 + "o" + s1.trim());
+                        } else if (res.toString().contains("Es")) {
+                            String s1 = res.toString().substring(res.toString().indexOf("Es") + 1);
+                            String s2 = res.toString().substring(0, res.toString().indexOf("Es"));
+                            res = new StringBuffer(s2 + "e" + s1.trim());
+                        } else if (res.toString().contains("Au")) {
+                            String s1 = res.toString().substring(res.toString().indexOf("Au") + 1);
+                            String s2 = res.toString().substring(0, res.toString().indexOf("Au"));
+                            res = new StringBuffer(s2 + "a" + s1.trim());
+
+                            Log.i("s1", s1);
+                            Log.i("s2", s2);
+                        }
+
+                        String currentSelection = null;
+                        int counter = 0;
+                        selection = res.toString();
+                        selection = selection.trim().toString().replaceAll(" ", "_");
+
+                        for (String city : searchArrayList) {
+                            if (city.contains(selection)) {
+                                currentSelection = city;
+                                counter++;
+                            }
+                        }
+
+                        if (counter == 0) {
+                            selection = selection.trim().toString().replaceAll("_", "-");
+                            for (String city : searchArrayList) {
+                                if (city.contains(selection)) {
+                                    currentSelection = city;
+                                    counter++;
+                                }
+                            }
+                        }
+
+                        selection = currentSelection;
+
+
+                        if (counter > 0) {
+                            imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                            timeCalculator(selection);
+                            Clock mClock = new Clock();
+                            int currentHours = mClock.getHours();
+
+                            int timeZoneDifference = timeCalculator(selection);
+
+                            textView.setText("");
+
+                            timeLinearLayout.removeAllViews();
+
+                            loadImagesFromXML(timeZoneDifference, currentHours, selection);
+                        } else {
+                            textView.setText("");
+                            imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                            Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                        Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return false;
             }
         });
 
@@ -283,6 +377,7 @@ public class MainActivity extends Activity {
         TextView currentTime = new TextView(this);
         selection = selection.substring(selection.lastIndexOf('/') + 1);
         selection = selection.replaceAll("_", " ");
+        selection = selection.replaceAll("-", " ");
         currentTime.setText(selection);
         currentTime.setBackgroundColor(getResources().getColor(R.color.md_black_1000));
         currentTime.setGravity(Gravity.CENTER);
@@ -632,6 +727,13 @@ public class MainActivity extends Activity {
             timeZoneIsSame = 1; //in same time zone
         }
         return timeZoneIsSame;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+
+        finish();
     }
 
     private class ViewHolder {

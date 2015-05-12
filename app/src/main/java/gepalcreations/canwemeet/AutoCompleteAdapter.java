@@ -61,6 +61,11 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
                 }
             }
 
+            int counter = 0;
+            prefix = prefix.toString().replaceAll(" ", "_");
+
+            //prefix= prefix.toString().replaceAll(" ", "-");
+
             if (prefix == null || prefix.length() == 0) {
                 synchronized (lock) {
                     ArrayList<String> list = new ArrayList<String>(mOriginalValues);
@@ -68,7 +73,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
                     results.count = list.size();
                 }
             } else {
-                final String prefixString = prefix.toString().toLowerCase();
+                String prefixString = prefix.toString().toLowerCase();
 
                 ArrayList<String> values = mOriginalValues;
                 int count = values.size();
@@ -79,8 +84,23 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
                     String item = values.get(i);
                     if (item.toLowerCase().contains(prefixString)) {
                         newValues.add(item);
+                        counter++;
                     }
 
+                }
+
+                if (counter == 0) {
+                    prefix = prefix.toString().replaceAll("_", "-");
+                    prefixString = prefix.toString().toLowerCase();
+                    values = mOriginalValues;
+                    newValues = new ArrayList<String>(count);
+                    for (int i = 0; i < count; i++) {
+                        String item = values.get(i);
+                        if (item.toLowerCase().contains(prefixString)) {
+                            newValues.add(item);
+                            counter++;
+                        }
+                    }
                 }
 
                 results.values = newValues;
@@ -94,9 +114,9 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
 
-            if(results.values!=null){
+            if (results.values != null) {
                 fullList = (ArrayList<String>) results.values;
-            }else{
+            } else {
                 fullList = new ArrayList<String>();
             }
             if (results.count > 0) {
