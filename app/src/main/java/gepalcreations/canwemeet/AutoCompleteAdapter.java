@@ -67,9 +67,11 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
 
 			//This is always null fix it, disabled for no error
 			//=======================================================================================
-            //prefix = prefix.toString().replaceAll(" ", "_");
+
 
             //prefix= prefix.toString().replaceAll(" ", "-");
+
+            prefix = prefix.toString().replaceAll(" ", "_");
 
             if (prefix == null || prefix.length() == 0) {
                 synchronized (lock) {
