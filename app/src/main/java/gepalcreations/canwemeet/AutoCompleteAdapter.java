@@ -1,14 +1,14 @@
 package gepalcreations.canwemeet;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
 
@@ -20,7 +20,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
 
         super(context, resource, textViewResourceId, objects);
         fullList = (ArrayList<String>) objects;
-        mOriginalValues = new ArrayList<String>(fullList);
+        mOriginalValues = new ArrayList<>(fullList);
 
     }
 
@@ -50,6 +50,8 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
 
     private class ArrayFilter extends Filter {
         private Object lock;
+		//Error null with object lock needs to be fixed
+		//====================================================
 
         @Override
         protected FilterResults performFiltering(CharSequence prefix) {
@@ -57,18 +59,21 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
 
             if (mOriginalValues == null) {
                 synchronized (lock) {
-                    mOriginalValues = new ArrayList<String>(fullList);
+                    mOriginalValues = new ArrayList<>(fullList);
                 }
             }
 
             int counter = 0;
-            prefix = prefix.toString().replaceAll(" ", "_");
+
+			//This is always null fix it, disabled for no error
+			//=======================================================================================
+            //prefix = prefix.toString().replaceAll(" ", "_");
 
             //prefix= prefix.toString().replaceAll(" ", "-");
 
             if (prefix == null || prefix.length() == 0) {
                 synchronized (lock) {
-                    ArrayList<String> list = new ArrayList<String>(mOriginalValues);
+                    ArrayList<String> list = new ArrayList<>(mOriginalValues);
                     results.values = list;
                     results.count = list.size();
                 }
@@ -78,7 +83,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
                 ArrayList<String> values = mOriginalValues;
                 int count = values.size();
 
-                ArrayList<String> newValues = new ArrayList<String>(count);
+                ArrayList<String> newValues = new ArrayList<>(count);
 
                 for (int i = 0; i < count; i++) {
                     String item = values.get(i);
@@ -93,7 +98,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
                     prefix = prefix.toString().replaceAll("_", "-");
                     prefixString = prefix.toString().toLowerCase();
                     values = mOriginalValues;
-                    newValues = new ArrayList<String>(count);
+                    newValues = new ArrayList<>(count);
                     for (int i = 0; i < count; i++) {
                         String item = values.get(i);
                         if (item.toLowerCase().contains(prefixString)) {
@@ -117,7 +122,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
             if (results.values != null) {
                 fullList = (ArrayList<String>) results.values;
             } else {
-                fullList = new ArrayList<String>();
+                fullList = new ArrayList<>();
             }
             if (results.count > 0) {
                 notifyDataSetChanged();

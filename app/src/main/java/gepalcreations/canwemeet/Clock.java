@@ -6,20 +6,18 @@ import java.util.TimeZone;
 
 public class Clock {
 
-    Calendar current = Calendar.getInstance();
-	int currentTimeZone;
+	Calendar current = Calendar.getInstance();
 
 
-    public int getMinutes() {
-        int minute = current.get(Calendar.MINUTE);
-        return minute;
-    }
 
-    public int getHours (){
+	public int getMinutes() {
+		return current.get(Calendar.MINUTE);
+	}
 
-        int hour = current.get(Calendar.HOUR_OF_DAY);
-        return hour;
-    }
+	public int getHours() {
+
+		return current.get(Calendar.HOUR_OF_DAY);
+	}
 
 	//Getting Local time zone from system
 	public int getTimeZone() {
@@ -28,5 +26,4 @@ public class Clock {
 		return tzCurrent.getRawOffset() / 3600000;//seconds per day
 
 	}
-
 }

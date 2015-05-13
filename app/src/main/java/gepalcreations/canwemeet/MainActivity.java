@@ -2,6 +2,7 @@ package gepalcreations.canwemeet;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -41,12 +42,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout timeLinearLayout;
-    private View line;
     Context context = this;
-    static int activityHeight = 0;
     private Measures measures;
-    private Toolbar toolbar;
-    InputMethodManager imm;
+	InputMethodManager imm;
+	String userCity="";
 
     private enum dayPart {
         DAY, NOON, AFTERNOON, NIGHT
@@ -61,61 +60,58 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imm = (InputMethodManager) getSystemService(
-                Context.INPUT_METHOD_SERVICE);
+
+
+
+		imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
 
         //Get the appcompat toolbar
-        toolbar = (Toolbar) findViewById(R.id.app_bar);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
             setSupportActionBar(toolbar);
         }
 
 
-        //ActionBar actionBar = getActionBar();
-        //ActionBar.setDisplayHomeAsUpEnabled(false);
-        //actionBar.setDisplayShowCustomEnabled(true);
-        //actionBar.setDisplayShowTitleEnabled(true);
-        //actionBar.setIcon(R.drawable.ic_search);
-
-
         //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
         //int currentMinutes = mClock.getMinutes();
         int currentHours = mClock.getHours();
-        int currentTimeZone = mClock.getTimeZone();
 
-        //Kapou to gamisa kai einai sinexei null to selection. Gamiseto gia ayrio
-        /*String selection = "";
-        if (selection == null)
-            selection = "Europe/Berlin";*/
-        //gejava.util.Date date = new java.util.Date(System.currentTimeMillis());
+
 
         DateTimeZone dtz = DateTimeZone.getDefault();
-        String selection = dtz.getID();
-        Log.i("Value of selection", String.valueOf(selection));
+        //String selection = dtz.getID();
+
+		// Get the app's shared preferences
+		SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+
+		//Get Default Value
+		String selection = sharedPref.getString("userdata", null);
+
+		if (selection==null)
+			selection=dtz.getID();
+		//Log.i("stored selection", String.valueOf(selection));
+
+
+
+
+
+
+
+
+
+
+
+
 
         int timeZoneDifference = timeCalculator(selection);
-
-        //Log.e("hours", String.valueOf(currentHours));
-        //int height = getScreenHeight() - getDensityPixelToRemove(context);
-
-        //Log.e("Screen Height",String.valueOf(getScreenHeight()));
-        //Log.e("Screen Density",String.valueOf(getDensityPixelToRemove(context)));
-        //Log.e("Final Height",String.valueOf(height));
 
         //Loading Layout
         timeLinearLayout = (LinearLayout) findViewById(R.id.current_time_linear);
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
-        //Loading Line
-        //line = findViewById(R.id.line);
 
-        //File screenShotsDir = new File(Environment.getExternalStorageDirectory(), "CanWeMeet");
-
-        //if (!screenShotsDir.exists()) {
-        //    screenShotsDir.mkdirs();
-        //}
 
 
         measures = new Measures();
@@ -123,10 +119,6 @@ public class MainActivity extends AppCompatActivity {
         setPaddingToTextViews(currentHours);
 
         loadImagesFromXML(timeZoneDifference, currentHours, selection);
-
-        // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
-        //float timeCalculation = getTimeCalculation(currentHours, currentMinutes, measures.getLeftLinearHeight());
-        //line.setTranslationY(timeCalculation);
 
 
     }
@@ -148,18 +140,16 @@ public class MainActivity extends AppCompatActivity {
                 CityTable mCityTable = new CityTable();
                 String[] cities = mCityTable.tableReturn();
                 LayoutInflater inflator = (LayoutInflater) this
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View v = inflator.inflate(R.layout.actionbar, null);
 
-                //actionBar.setCustomView(v);
+				if(getSupportActionBar() != null)
+					getSupportActionBar();
 
                 getSupportActionBar().setDisplayShowCustomEnabled(true);
                 getSupportActionBar().setCustomView(v);
 
-                //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                //        android.R.layout.simple_dropdown_item_1line, cities);
-
-                final ArrayList<String> searchArrayList = new ArrayList<String>(Arrays.asList(cities));
+                final ArrayList<String> searchArrayList = new ArrayList<>(Arrays.asList(cities));
 
                 AutoCompleteAdapter adapter = new AutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line, android.R.id.text1, searchArrayList);
 
@@ -170,20 +160,33 @@ public class MainActivity extends AppCompatActivity {
                 textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
-                        String selection = (String) parent.getItemAtPosition(position);
+						String selection = (String) parent.getItemAtPosition(position);
+						//Log.i("at position selection ", selection);
+
+						//Save the usercity which is clicked
+						SharedPreferences sharedPref = MainActivity.this.getPreferences(Context.MODE_PRIVATE);
+						SharedPreferences.Editor editor = sharedPref.edit();
+						editor.putString("userdata", selection);
+						editor.commit();
+						//Log.i("userdata", selection);
+
 
                         timeCalculator(selection);
                         Clock mClock = new Clock();
                         int currentHours = mClock.getHours();
                         int timeZoneDifference = timeCalculator(selection);
 
-                        textView.setText("");
+						textView.setText("");
 
                         imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
 
-                        timeLinearLayout.removeAllViews();
+						timeLinearLayout.removeAllViews();
+
 
                         loadImagesFromXML(timeZoneDifference, currentHours, selection);
+
+
+
 
                     }
                 });
@@ -228,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                                 String currentSelection = null;
                                 int counter = 0;
                                 selection = res.toString();
-                                selection = selection.trim().toString().replaceAll(" ", "_");
+                                selection = selection.trim().replaceAll(" ", "_");
 
                                 for (String city : searchArrayList) {
                                     if (city.contains(selection)) {
@@ -238,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                                 if (counter == 0) {
-                                    selection = selection.trim().toString().replaceAll("_", "-");
+                                    selection = selection.trim().replaceAll("_", "-");
                                     for (String city : searchArrayList) {
                                         if (city.contains(selection)) {
                                             currentSelection = city;
@@ -293,13 +296,12 @@ public class MainActivity extends AppCompatActivity {
         java.util.Date date = new java.util.Date(System.currentTimeMillis());
         DateTimeZone dtz = DateTimeZone.getDefault();// Gets the default time zone.
         DateTime dateTime = new DateTime(date.getTime(), dtz);
-        int timeZoneDifference = dtLondon.getHourOfDay() - dateTime.getHourOfDay();
 
-        Log.i("Difference", String.valueOf(timeZoneDifference));
-        Log.i("Date time from yoda", String.valueOf(dateTime));
-        Log.i("Date time zone for id", String.valueOf(dtLondon));
+		//Log.i("Difference", String.valueOf(timeZoneDifference));
+        //Log.i("Date time from yoda", String.valueOf(dateTime));
+        //Log.i("Date time zone for id", String.valueOf(dtLondon));
 
-        return timeZoneDifference;
+        return dtLondon.getHourOfDay() - dateTime.getHourOfDay();
     }
 
 
@@ -309,7 +311,8 @@ public class MainActivity extends AppCompatActivity {
     public void loadImagesFromXML(int timeZone, int ct, String selection) {
         // checking and correcting for negative value
         if (timeZone < 0) {
-            timeZone = timeZone * (-1);
+            timeZone = 24 - (timeZone * (-1));
+
         }
         LinearLayout.LayoutParams firstMorningRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
         LinearLayout.LayoutParams firstNoonRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
@@ -442,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < 25; i++) {
             indexes[i] = ((i + 1) + timeZone) % 25;
-            Log.i("Time", String.valueOf(indexes[i]));
+            //Log.i("Time", String.valueOf(indexes[i]));
         }
 
         for (int i = 0; i < 25; i++) {
@@ -504,8 +507,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < firstMorningLinear.getChildCount(); i++) {
 
             if (i > 0) {
-                View curChild = ((ViewGroup) firstMorningLinear).getChildAt(i);
-                View previousChild = ((ViewGroup) firstMorningLinear).getChildAt(i - 1);
+                View curChild = ( firstMorningLinear).getChildAt(i);
+                View previousChild = (firstMorningLinear).getChildAt(i - 1);
 
                 TextView curChildTextView = (TextView) ((ViewGroup) curChild).getChildAt(0);
                 TextView previousChildTextView = (TextView) ((ViewGroup) previousChild).getChildAt(0);
@@ -522,8 +525,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < firstNoonLinear.getChildCount(); i++) {
 
             if (i > 0) {
-                View curChild = ((ViewGroup) firstNoonLinear).getChildAt(i);
-                View previousChild = ((ViewGroup) firstNoonLinear).getChildAt(i - 1);
+                View curChild = ( firstNoonLinear).getChildAt(i);
+                View previousChild = ( firstNoonLinear).getChildAt(i - 1);
 
                 TextView curChildTextView = (TextView) ((ViewGroup) curChild).getChildAt(0);
                 TextView previousChildTextView = (TextView) ((ViewGroup) previousChild).getChildAt(0);
@@ -539,8 +542,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < firstAfternoonLinear.getChildCount(); i++) {
 
             if (i > 0) {
-                View curChild = ((ViewGroup) firstAfternoonLinear).getChildAt(i);
-                View previousChild = ((ViewGroup) firstAfternoonLinear).getChildAt(i - 1);
+                View curChild = ( firstAfternoonLinear).getChildAt(i);
+                View previousChild = ( firstAfternoonLinear).getChildAt(i - 1);
 
                 TextView curChildTextView = (TextView) ((ViewGroup) curChild).getChildAt(0);
                 TextView previousChildTextView = (TextView) ((ViewGroup) previousChild).getChildAt(0);
@@ -556,8 +559,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < firstNightLinear.getChildCount(); i++) {
 
             if (i > 0) {
-                View curChild = ((ViewGroup) firstNightLinear).getChildAt(i);
-                View previousChild = ((ViewGroup) firstNightLinear).getChildAt(i - 1);
+                View curChild = ( firstNightLinear).getChildAt(i);
+                View previousChild = ( firstNightLinear).getChildAt(i - 1);
 
                 TextView curChildTextView = (TextView) ((ViewGroup) curChild).getChildAt(0);
                 TextView previousChildTextView = (TextView) ((ViewGroup) previousChild).getChildAt(0);
@@ -644,24 +647,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private static int getDensityPixelToRemove(Context context) {
-
-        float density = context.getResources().getDisplayMetrics().density;
-        //action bar 48dp and status bar 20dp
-        if (density >= 4.0) {
-            return 384;//48+20+60*3
-        }
-        if (density >= 3.0) {
-            return 244;
-        }
-        if (density >= 2.0) {
-            return 176;
-        }
-        if (density >= 1.5) {
-            return 142;
-        }
-        return 68;
-    }
 
     public int getScreenWidth() {
 
@@ -751,14 +736,12 @@ public class MainActivity extends AppCompatActivity {
 
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-        return px;
+		return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     public int pxToDp(int px) {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-        int dp = Math.round(px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-        return dp;
+		return Math.round(px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     //Calculate time for line animation
@@ -767,17 +750,6 @@ public class MainActivity extends AppCompatActivity {
         float pixelPerHour = (height / 24) + (measures.getPadding());
 
         return currentHours * pixelPerHour + currentMinutes;
-    }
-
-    //Method to check if we are in the same time zone as entered by user. If yes then passing the 0 index to the array so
-    //it will display the same image.
-    private int compareSameTimeZone(int timeZone, int currentTimeZone) {
-
-        int timeZoneIsSame = 0; //initialize to not in same zone
-        if (timeZone == currentTimeZone) {
-            timeZoneIsSame = 1; //in same time zone
-        }
-        return timeZoneIsSame;
     }
 
     @Override
@@ -789,7 +761,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class ViewHolder {
         TextView hour;
-        ImageView icon;
+
     }
 
     private static class Measures {
