@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Context context = this;
     private Measures measures;
     private InputMethodManager imm;
-    private String userCity = "";
+    //private String userCity = "";
     private boolean autoCompleteTextViewisOpened = false;
 
     private enum dayPart {
@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
                         int timeZoneDifference = timeCalculator(selection);
 
                         textView.setText("");
+
+
 
                         imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
 
@@ -427,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
         selection = selection.replaceAll("_", " ");
         selection = selection.replaceAll("-", " ");
         currentTime.setText(selection);
-        currentTime.setBackgroundColor(getResources().getColor(R.color.md_black_1000));
+        currentTime.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
         currentTime.setGravity(Gravity.CENTER);
         currentTime.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
         currentTime.setTextColor(getResources().getColor(R.color.md_white_1000));
@@ -455,23 +457,24 @@ public class MainActivity extends AppCompatActivity {
                 holder.hour.setText(String.valueOf(indexes[i]));
                 if (indexes[i] == (ct + timeZone)) {
                     holder.hour.setTypeface(null, Typeface.BOLD_ITALIC);
+                   
                 }
                 holder.hour.measure(widthMeasureSpec, heightMeasureSpec);
 
                 if (indexes[i] >= 1 && indexes[i] <= 7) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_red_400));
                     dp = dayPart.NIGHT;
                     tc = textViewColors.PURPLE;
                 } else if (indexes[i] >= 8 && indexes[i] <= 10) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_teal_500));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_deep_orange_400));
                     dp = dayPart.DAY;
                     tc = textViewColors.TEAL;
                 } else if (indexes[i] >= 11 && indexes[i] <= 17) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_amber_500));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_light_green_400));
                     dp = dayPart.NOON;
                     tc = textViewColors.AMBER;
                 } else {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_brown_500));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_teal_400));
                     dp = dayPart.AFTERNOON;
                     tc = textViewColors.BROWN;
                 }
