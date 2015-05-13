@@ -1,46 +1,52 @@
 package gepalcreations.canwemeet;
 
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private LinearLayout timeLinearLayout;
     private View line;
     Context context = this;
     static int activityHeight = 0;
-
     private Measures measures;
-
-
-
+    private Toolbar toolbar;
+    InputMethodManager imm;
 
     private enum dayPart {
         DAY, NOON, AFTERNOON, NIGHT
@@ -50,79 +56,29 @@ public class MainActivity extends Activity {
         PURPLE, TEAL, AMBER, BROWN
     }
 
-
-    // Pacific (US) -> US/Pacific
-    // Pacific New (US) -> US/Pacific-New
-    // Pacific (Canada) -> Canada/Pacific
-    // "Shiprock, Navajo"
-    // Mountain (US) -> US/Mountain
-    // Mountain (Canada) -> Canada/Mountain
-    // Knox (Indiana) -> America/Indiana/Knox
-    // Knox IN -> America/Knox_IN
-    // Starke (Indiana) -> US/Indiana-Starke
-    // ^--"America/Knox_IN, US/Indiana-Starke"
-    // Tell City (Indiana) -> America/Indiana/Tell_City
-    // New Salem (North Dakota) -> America/North_Dakota/New_Salem
-    // East Saskatchewan -> Canada/East-Saskatchewan
-    // ^-- Canada/East-Saskatchewan, Canada/Saskatchewan
-
-    /*private static final String[] cities = new String[]{
-            "Apia", "Midway", "Niue", "Pago Pago", "Samoa", "Adak", "Atka", "Aleutian",
-            "Fakaofo", "Honolulu", "Hawaii", "Johnston", "Rarotonga", "Tahiti", "Marquesas",
-            "Anchorage", "Alaska", "Juneau", "Nome", "Yakutat", "Gambier", "Dawson", "Los Angeles",
-            "Pacific (US)", "Pacific New (US)", "Santa Isabel", "Tijuana", "Ensenada", "BajaNorte", "Vancouver",
-            "Pacific (Canada)", "Whitehorse", "Yukon", "Pitcairn", "Boise", "Cambridge Bay", "Chihuahua",
-            "Dawson Creek", "Denver", "Shiprock", "Navajo", "Mountain (US)", "Edmonton", "Mountain (Canada)",
-            "Hermosillo", "Inuvik", "Mazatlan", "BajaSur", "Ojinaga", "Phoenix", "Arizona", "Yellowknife",
-            "Bahia Banderas", "Belize", "Cancun", "Chicago", "Central", "Costa Rica", "El Salvador", "Guatemala",
-            "Knox (Indiana)", "Knox IN", "Starke (Indiana)", "Tell City (Indiana)", "Managua", "Matamoros", "Menominee",
-            "Merida", "Mexico City", "Monterrey", "New Salem (North Dakota)", "Rainy River", "Rankin Inlet", "Regina",
-            "East Saskatchewan", "Saskatchewan"
-    };*/
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CityTable mCityTable = new CityTable();
-        String [] cities = mCityTable.tableReturn();
+        imm = (InputMethodManager) getSystemService(
+                Context.INPUT_METHOD_SERVICE);
 
 
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setIcon(R.drawable.ic_search);
-
-        LayoutInflater inflator = (LayoutInflater) this
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflator.inflate(R.layout.actionbar, null);
-
-        actionBar.setCustomView(v);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, cities);
-        AutoCompleteTextView textView = (AutoCompleteTextView) v
-                .findViewById(R.id.editText1);
-        textView.setAdapter(adapter);
-
-        textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
-                String selection = (String) parent.getItemAtPosition(position);
-                timeCalculator(selection);
-                Clock mClock = new Clock();
-
-                int currentHours = mClock.getHours();
-                int timeZoneDifference = timeCalculator(selection);
-                loadImagesFromXML(timeZoneDifference, currentHours, selection);
+        //Get the appcompat toolbar
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.app_name);
+            setSupportActionBar(toolbar);
+        }
 
 
-            }
-        });
+        //ActionBar actionBar = getActionBar();
+        //ActionBar.setDisplayHomeAsUpEnabled(false);
+        //actionBar.setDisplayShowCustomEnabled(true);
+        //actionBar.setDisplayShowTitleEnabled(true);
+        //actionBar.setIcon(R.drawable.ic_search);
+
 
         //Getting time from clock and timezone animation class in minutes
         Clock mClock = new Clock();
@@ -162,9 +118,10 @@ public class MainActivity extends Activity {
         //}
 
 
-
         measures = new Measures();
+
         setPaddingToTextViews(currentHours);
+
         loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
         // float timeCalculation = getTimeCalculation(currentHours, currentMinutes, height);
@@ -172,6 +129,158 @@ public class MainActivity extends Activity {
         //line.setTranslationY(timeCalculation);
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+      /* Inflate the menu; this adds items to the action bar if
+      it is present */
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_search:
+                //Initialize Table
+                CityTable mCityTable = new CityTable();
+                String[] cities = mCityTable.tableReturn();
+                LayoutInflater inflator = (LayoutInflater) this
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View v = inflator.inflate(R.layout.actionbar, null);
+
+                //actionBar.setCustomView(v);
+
+                getSupportActionBar().setDisplayShowCustomEnabled(true);
+                getSupportActionBar().setCustomView(v);
+
+                //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                //        android.R.layout.simple_dropdown_item_1line, cities);
+
+                final ArrayList<String> searchArrayList = new ArrayList<String>(Arrays.asList(cities));
+
+                AutoCompleteAdapter adapter = new AutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line, android.R.id.text1, searchArrayList);
+
+                final AutoCompleteTextView textView = (AutoCompleteTextView) v
+                        .findViewById(R.id.editText1);
+                textView.setAdapter(adapter);
+
+                textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
+                        String selection = (String) parent.getItemAtPosition(position);
+
+                        timeCalculator(selection);
+                        Clock mClock = new Clock();
+                        int currentHours = mClock.getHours();
+                        int timeZoneDifference = timeCalculator(selection);
+
+                        textView.setText("");
+
+                        imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+
+                        timeLinearLayout.removeAllViews();
+
+                        loadImagesFromXML(timeZoneDifference, currentHours, selection);
+
+                    }
+                });
+
+                textView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+
+
+                            if (!textView.getText().toString().equals("")) {
+
+                                String selection = textView.getText().toString();
+
+                                StringBuffer res = new StringBuffer();
+
+                                String[] strArr = selection.split(" ");
+                                for (String str : strArr) {
+                                    char[] stringArray = str.trim().toCharArray();
+                                    stringArray[0] = Character.toUpperCase(stringArray[0]);
+                                    str = new String(stringArray);
+
+                                    res.append(str).append(" ");
+                                }
+
+                                if (res.toString().contains("Of")) {
+                                    String s1 = res.toString().substring(res.toString().indexOf("Of") + 1);
+                                    String s2 = res.toString().substring(0, res.toString().indexOf("Of"));
+                                    res = new StringBuffer(s2 + "o" + s1.trim());
+                                } else if (res.toString().contains("Es")) {
+                                    String s1 = res.toString().substring(res.toString().indexOf("Es") + 1);
+                                    String s2 = res.toString().substring(0, res.toString().indexOf("Es"));
+                                    res = new StringBuffer(s2 + "e" + s1.trim());
+                                } else if (res.toString().contains("Au")) {
+                                    String s1 = res.toString().substring(res.toString().indexOf("Au") + 1);
+                                    String s2 = res.toString().substring(0, res.toString().indexOf("Au"));
+                                    res = new StringBuffer(s2 + "a" + s1.trim());
+
+                                    Log.i("s1", s1);
+                                    Log.i("s2", s2);
+                                }
+
+                                String currentSelection = null;
+                                int counter = 0;
+                                selection = res.toString();
+                                selection = selection.trim().toString().replaceAll(" ", "_");
+
+                                for (String city : searchArrayList) {
+                                    if (city.contains(selection)) {
+                                        currentSelection = city;
+                                        counter++;
+                                    }
+                                }
+
+                                if (counter == 0) {
+                                    selection = selection.trim().toString().replaceAll("_", "-");
+                                    for (String city : searchArrayList) {
+                                        if (city.contains(selection)) {
+                                            currentSelection = city;
+                                            counter++;
+                                        }
+                                    }
+                                }
+
+                                selection = currentSelection;
+
+
+                                if (counter > 0) {
+                                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                                    timeCalculator(selection);
+                                    Clock mClock = new Clock();
+                                    int currentHours = mClock.getHours();
+
+                                    int timeZoneDifference = timeCalculator(selection);
+
+                                    textView.setText("");
+
+                                    timeLinearLayout.removeAllViews();
+
+                                    loadImagesFromXML(timeZoneDifference, currentHours, selection);
+                                } else {
+                                    textView.setText("");
+                                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                                    Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                                Toast.makeText(getApplicationContext(), "No results", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        return false;
+                    }
+                });
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private int timeCalculator(String selection) {
@@ -202,7 +311,6 @@ public class MainActivity extends Activity {
         if (timeZone < 0) {
             timeZone = timeZone * (-1);
         }
-
         LinearLayout.LayoutParams firstMorningRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
         LinearLayout.LayoutParams firstNoonRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
         LinearLayout.LayoutParams firstAfternoonRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
@@ -213,6 +321,7 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams secondAfternoonRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
         LinearLayout.LayoutParams secondNightRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
 
+        LinearLayout.LayoutParams cityParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
 
         RelativeLayout.LayoutParams firstMorningLinearParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         RelativeLayout.LayoutParams firstNoonLinearParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -264,10 +373,24 @@ public class MainActivity extends Activity {
         ImageView work = new ImageView(this);
         ImageView home = new ImageView(this);
 
-        Drawable sleepImage = getResources().getDrawable(R.drawable.ic_sleep, getTheme());
-        Drawable coffeeImage = getResources().getDrawable(R.drawable.ic_coffee, getTheme());
-        Drawable workImage = getResources().getDrawable(R.drawable.ic_work, getTheme());
-        Drawable homeImage = getResources().getDrawable(R.drawable.ic_home, getTheme());
+        Drawable sleepImage;
+        Drawable coffeeImage;
+        Drawable workImage;
+        Drawable homeImage;
+
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 21) {
+            sleepImage = getResources().getDrawable(R.drawable.ic_sleep, getTheme());
+            coffeeImage = getResources().getDrawable(R.drawable.ic_coffee, getTheme());
+            workImage = getResources().getDrawable(R.drawable.ic_work, getTheme());
+            homeImage = getResources().getDrawable(R.drawable.ic_home, getTheme());
+        } else {
+            sleepImage = getResources().getDrawable(R.drawable.ic_sleep);
+            coffeeImage = getResources().getDrawable(R.drawable.ic_coffee);
+            workImage = getResources().getDrawable(R.drawable.ic_work);
+            homeImage = getResources().getDrawable(R.drawable.ic_home);
+        }
+
 
         sleepParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         sleepParams.addRule(RelativeLayout.CENTER_VERTICAL);
@@ -302,9 +425,20 @@ public class MainActivity extends Activity {
 
         timeLinearLayout.addView(wholeLinear);
 
-        TextView currentTime = (TextView) findViewById(R.id.current_city);
+        TextView currentTime = new TextView(this);
+        selection = selection.substring(selection.lastIndexOf('/') + 1);
+        selection = selection.replaceAll("_", " ");
+        selection = selection.replaceAll("-", " ");
         currentTime.setText(selection);
-        currentTime.setPadding(0, measures.getPadding() + dpToPx(1), 0, measures.getPadding());
+        currentTime.setBackgroundColor(getResources().getColor(R.color.md_black_1000));
+        currentTime.setGravity(Gravity.CENTER);
+        currentTime.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
+        currentTime.setTextColor(getResources().getColor(R.color.md_white_1000));
+        currentTime.setTextSize(20);
+        currentTime.setPadding(0, measures.getPadding(), 0, measures.getPadding() + +dpToPx(1));
+        currentTime.requestFocus();
+
+        wholeLinear.addView(currentTime, cityParams);
 
         for (int i = 0; i < 25; i++) {
             indexes[i] = ((i + 1) + timeZone) % 25;
@@ -644,6 +778,13 @@ public class MainActivity extends Activity {
             timeZoneIsSame = 1; //in same time zone
         }
         return timeZoneIsSame;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+
+        finish();
     }
 
     private class ViewHolder {

@@ -6,7 +6,12 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar" />
+
     <ScrollView
+        android:layout_below="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">
@@ -429,18 +434,6 @@
                     android:orientation="vertical"
                     android:weightSum="25">
 
-                    <TextView
-                        android:id="@+id/current_city"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@color/md_black_1000"
-                        android:gravity="center"
-                        android:paddingRight="10dp"
-
-                        android:textAlignment="gravity"
-                        android:textColor="@color/md_white_1000"
-                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -451,7 +444,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:background="@color/md_grey_500"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </RelativeLayout>
 
