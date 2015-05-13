@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
         selection = selection.replaceAll("_", " ");
         selection = selection.replaceAll("-", " ");
         currentTime.setText(selection);
-        currentTime.setBackgroundColor(getResources().getColor(R.color.md_purple_500));
+        currentTime.setBackgroundColor(getResources().getColor(R.color.md_teal_500));
         currentTime.setGravity(Gravity.CENTER);
         currentTime.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
         currentTime.setTextColor(getResources().getColor(R.color.md_white_1000));
@@ -457,24 +457,24 @@ public class MainActivity extends AppCompatActivity {
                 holder.hour.setText(String.valueOf(indexes[i]));
                 if (indexes[i] == (ct + timeZone)) {
                     holder.hour.setTypeface(null, Typeface.BOLD_ITALIC);
-                   
+
                 }
                 holder.hour.measure(widthMeasureSpec, heightMeasureSpec);
 
                 if (indexes[i] >= 1 && indexes[i] <= 7) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_red_400));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_red_300));
                     dp = dayPart.NIGHT;
                     tc = textViewColors.PURPLE;
                 } else if (indexes[i] >= 8 && indexes[i] <= 10) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_deep_orange_400));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_purple_300));
                     dp = dayPart.DAY;
                     tc = textViewColors.TEAL;
                 } else if (indexes[i] >= 11 && indexes[i] <= 17) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_light_green_400));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_deep_purple_300));
                     dp = dayPart.NOON;
                     tc = textViewColors.AMBER;
                 } else {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_teal_400));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_indigo_300));
                     dp = dayPart.AFTERNOON;
                     tc = textViewColors.BROWN;
                 }
@@ -715,6 +715,8 @@ public class MainActivity extends AppCompatActivity {
 
             if (t.getText().toString().equals(String.valueOf(currentHours)))
                 t.setTypeface(null, Typeface.BOLD_ITALIC);
+
+
 
             t.setPadding(0, (int) Math.ceil(padding), dpToPx(10), (int) Math.ceil(padding));
         }
