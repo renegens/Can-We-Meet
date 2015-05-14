@@ -19,7 +19,9 @@
         <RelativeLayout
             android:id="@+id/main_relative"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:onClick="tooltip">
 
             <LinearLayout
                 android:layout_width="match_parent"

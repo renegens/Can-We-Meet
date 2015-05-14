@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private InputMethodManager imm;
     //private String userCity = "";
     private boolean autoCompleteTextViewisOpened = false;
+    private TooltipWindow tipWindow;
+    private CurrentTimeView tv;
 
     private enum dayPart {
         DAY, NOON, AFTERNOON, NIGHT
@@ -78,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         //int currentMinutes = mClock.getMinutes();
         int currentHours = mClock.getHours();
 
-
         DateTimeZone dtz = DateTimeZone.getDefault();
         //String selection = dtz.getID();
 
@@ -100,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
 
 
+        tipWindow = new TooltipWindow(MainActivity.this);
+
         measures = new Measures();
 
         setPaddingToTextViews(currentHours);
@@ -107,6 +110,14 @@ public class MainActivity extends AppCompatActivity {
         loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
 
+        View line = (View) findViewById(R.id.line);
+        line.setTranslationY(getTimeCalculation(currentHours, mClock.getMinutes(), measures.getLeftLinearHeight()));
+
+    }
+
+    public void tooltip(View anchor) {
+        if (!tipWindow.isTooltipShown())
+            tipWindow.showToolTip(tv.getV(), tv.getTime(), measures.getPadding());
     }
 
     @Override
@@ -148,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!autoCompleteTextViewisOpened) {
                     textView.setVisibility(View.VISIBLE);
                     autoCompleteTextViewisOpened = true;
-                }else{
+                } else {
                     textView.setVisibility(View.GONE);
                     autoCompleteTextViewisOpened = false;
                 }
@@ -173,7 +184,6 @@ public class MainActivity extends AppCompatActivity {
                         int timeZoneDifference = timeCalculator(selection);
 
                         textView.setText("");
-
 
 
                         imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
@@ -686,19 +696,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setPaddingToTextViews(int currentHours) {
-        int[] textViewIds = {R.id.hereTextView, R.id.hour_1, R.id.hour_2, R.id.hour_3, R.id.hour_4, R.id.hour_5, R.id.hour_6, R.id.hour_7, R.id.hour_8, R.id.hour_9, R.id.hour_10, R.id.hour_11, R.id.hour_12, R.id.hour_13, R.id.hour_14, R.id.hour_15, R.id.hour_16, R.id.hour_17, R.id.hour_18, R.id.hour_19, R.id.hour_20, R.id.hour_21, R.id.hour_22, R.id.hour_23, R.id.hour_24,};
+
+        if (currentHours == 0)
+            currentHours = 24;
+
+        int[] textViewIds = {R.id.hereTextView, R.id.hour_1, R.id.hour_2, R.id.hour_3, R.id.hour_4, R.id.hour_5, R.id.hour_6, R.id.hour_7, R.id.hour_8, R.id.hour_9, R.id.hour_10, R.id.hour_11, R.id.hour_12, R.id.hour_13, R.id.hour_14, R.id.hour_15, R.id.hour_16, R.id.hour_17, R.id.hour_18, R.id.hour_19, R.id.hour_20, R.id.hour_21, R.id.hour_22, R.id.hour_23, R.id.hour_24};
+
         List<TextView> textViews = new ArrayList<>();
         int activityHeight = getScreenHeight() - getActionBarHeight() - getStatusBarHeight();
         measures.setActivityHeight(activityHeight);
         int sum = 0, pixelsDiff;
         double padding;
-
         int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(getScreenWidth(), View.MeasureSpec.AT_MOST);
         int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
         for (int i : textViewIds) {
-            TextView textView = (TextView) findViewById(i);
 
+            TextView textView = (TextView) findViewById(i);
             textView.measure(widthMeasureSpec, heightMeasureSpec);
             sum += textView.getMeasuredHeight();
             textViews.add(textView);
@@ -709,13 +723,16 @@ public class MainActivity extends AppCompatActivity {
         Log.i("padding", String.valueOf(padding));
         Log.i("padding_floor", String.valueOf(Math.floor(padding)));
         Log.i("padding_ceil", String.valueOf(Math.ceil(padding)));
+        tv = new CurrentTimeView();
         for (TextView t : textViews) {
             // Math.floor -> px 4.5 to kanei 4
             // Math.ceil -> px 4.5 to kanei 5
 
-            if (t.getText().toString().equals(String.valueOf(currentHours)))
+            if (t.getText().toString().equals(String.valueOf(currentHours))) {
                 t.setTypeface(null, Typeface.BOLD_ITALIC);
-
+                tv.setV(t);
+                tv.setTime(t.getText().toString());
+            }
 
 
             t.setPadding(0, (int) Math.ceil(padding), dpToPx(10), (int) Math.ceil(padding));
@@ -746,7 +763,7 @@ public class MainActivity extends AppCompatActivity {
     //Calculate time for line animation
     private float getTimeCalculation(int currentHours, int currentMinutes, float height) {
         // float pixelPerHour = height / 25;
-        float pixelPerHour = (height / 24) + (measures.getPadding());
+        float pixelPerHour = (height / 24) - (measures.getPadding() / 2);
 
         return currentHours * pixelPerHour + currentMinutes;
     }
@@ -758,9 +775,38 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    protected void onDestroy() {
+        if (tipWindow != null && tipWindow.isTooltipShown())
+            tipWindow.dismissTooltip();
+        super.onDestroy();
+    }
+
     private class ViewHolder {
         TextView hour;
 
+    }
+
+    private class CurrentTimeView {
+        View v;
+        String time;
+
+        public View getV() {
+            return v;
+        }
+
+        public String getTime() {
+            return time;
+        }
+
+
+        public void setV(View v) {
+            this.v = v;
+        }
+
+        public void setTime(String time) {
+            this.time = time;
+        }
     }
 
     private static class Measures {
