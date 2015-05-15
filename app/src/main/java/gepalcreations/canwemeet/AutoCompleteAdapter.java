@@ -1,6 +1,7 @@
 package gepalcreations.canwemeet;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -55,14 +56,22 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
 
         @Override
         protected FilterResults performFiltering(CharSequence prefix) {
-            FilterResults results = new FilterResults();
+            final FilterResults results = new FilterResults();
 
+            //lock throuws exceptions in logcat. Changed with thread
+            //Although it never seem to pass in this if
             if (mOriginalValues == null) {
-                synchronized (lock) {
-                    mOriginalValues = new ArrayList<>(fullList);
-                }
+                //synchronized (lock) {
+                Runnable runnable = new Runnable() {
+                    public void run(){
+                        mOriginalValues=new ArrayList<>(fullList); //
+                        Log.e("mOriginalVa", "Set--------------------------------------------");
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
+                // }
             }
-
             int counter = 0;
 
 			//This is always null fix it, disabled for no error
@@ -70,15 +79,21 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> implements Filtera
 
 
             //prefix= prefix.toString().replaceAll(" ", "-");
-
+//!!!exception and details
+            //  https://gist.github.com/chronvas/3f450e70292a84981a30
             prefix = prefix.toString().replaceAll(" ", "_");
 
             if (prefix == null || prefix.length() == 0) {
-                synchronized (lock) {
-                    ArrayList<String> list = new ArrayList<>(mOriginalValues);
-                    results.values = list;
-                    results.count = list.size();
-                }
+                Runnable runnable = new Runnable() {
+                    public void run(){
+                        ArrayList<String> list = new ArrayList<>(mOriginalValues);
+                        results.values = list;
+                        results.count = list.size();
+                        Log.e("PASS","-------------------------------------------------pass");
+                    }
+                };
+                Thread mythread = new Thread(runnable);
+                mythread.start();
             } else {
                 String prefixString = prefix.toString().toLowerCase();
 
