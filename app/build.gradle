@@ -8,7 +8,7 @@ android {
         applicationId "gepalcreations.canwemeet"
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 1
+        versionCode 2
         versionName "0.1"
     }
     buildTypes {
