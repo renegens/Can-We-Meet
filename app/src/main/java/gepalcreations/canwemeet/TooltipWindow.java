@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -57,11 +58,11 @@ public class TooltipWindow {
 
             // Get rect for anchor view
             anchor_rect = new Rect(screen_pos[0], screen_pos[1], screen_pos[0]
-                    + anchor.getWidth() * 2, (int) (screen_pos[1] - anchor.getHeight() * padding));
+                    + anchor.getWidth() * 2 - dpToPx(2), (int) (screen_pos[1] - anchor.getHeight() * padding));
         } else {
             // Get rect for anchor view
             anchor_rect = new Rect(screen_pos[0], screen_pos[1], screen_pos[0]
-                    + anchor.getWidth() * 2, screen_pos[1] + anchor.getHeight());
+                    + anchor.getWidth() * 2 + dpToPx(2), screen_pos[1] + (anchor.getHeight() / 2));
         }
 
         // Call view measure to calculate how big your view should be.
@@ -95,6 +96,11 @@ public class TooltipWindow {
     void dismissTooltip() {
         if (tipWindow != null && tipWindow.isShowing())
             tipWindow.dismiss();
+    }
+
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     Handler handler = new Handler() {

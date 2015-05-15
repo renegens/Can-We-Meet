@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         timeLinearLayout.setOrientation(LinearLayout.VERTICAL);
 
 
-        tipWindow = new TooltipWindow(MainActivity.this);
+
 
         measures = new Measures();
 
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tooltip(View anchor) {
+        tipWindow = new TooltipWindow(this);
         if (!tipWindow.isTooltipShown())
             tipWindow.showToolTip(tv.getV(), tv.getTime(), measures.getPadding());
     }
