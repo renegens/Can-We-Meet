@@ -4,9 +4,10 @@
 
     <solid android:color="#009788" />
 
-    <stroke
+     <!--Stroke is the same color as the solid, so it is not needed-->
+    <!--<stroke
         android:width="2dp"
-        android:color="#009788" />
+        android:color="#009788" />-->
 
     <corners android:radius="2dp" />
 

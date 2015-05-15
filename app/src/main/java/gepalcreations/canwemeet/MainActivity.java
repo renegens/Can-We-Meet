@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                         SharedPreferences sharedPref = MainActivity.this.getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("userdata", selection);
-                        editor.commit();
+                        editor.apply();
                         //Log.i("userdata", selection);
 
 
