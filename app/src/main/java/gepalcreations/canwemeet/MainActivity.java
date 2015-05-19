@@ -3,6 +3,7 @@ package gepalcreations.canwemeet;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -467,7 +468,8 @@ public class MainActivity extends AppCompatActivity {
 
                 holder.hour.setText(String.valueOf(indexes[i]));
                 if (indexes[i] == (ct + timeZone)) {
-                    holder.hour.setTypeface(null, Typeface.BOLD_ITALIC);
+                    holder.hour.setTypeface(null, Typeface.BOLD);
+                    holder.hour.setTextColor(Color.YELLOW);
 
                 }
                 holder.hour.measure(widthMeasureSpec, heightMeasureSpec);
@@ -477,15 +479,15 @@ public class MainActivity extends AppCompatActivity {
                     dp = dayPart.NIGHT;
                     tc = textViewColors.PURPLE;
                 } else if (indexes[i] >= 8 && indexes[i] <= 10) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_purple_300));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_brown_200));
                     dp = dayPart.DAY;
                     tc = textViewColors.TEAL;
                 } else if (indexes[i] >= 11 && indexes[i] <= 17) {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_deep_purple_300));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_teal_200));
                     dp = dayPart.NOON;
                     tc = textViewColors.AMBER;
                 } else {
-                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_indigo_300));
+                    holder.hour.setBackgroundColor(getResources().getColor(R.color.md_blue_grey_300));
                     dp = dayPart.AFTERNOON;
                     tc = textViewColors.BROWN;
                 }
@@ -730,7 +732,8 @@ public class MainActivity extends AppCompatActivity {
             // Math.ceil -> px 4.5 to kanei 5
 
             if (t.getText().toString().equals(String.valueOf(currentHours))) {
-                t.setTypeface(null, Typeface.BOLD_ITALIC);
+                t.setTypeface(null, Typeface.BOLD);
+                t.setTextColor(Color.YELLOW);
                 tv.setV(t);
                 tv.setTime(t.getText().toString());
             }
