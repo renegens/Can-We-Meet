@@ -155,7 +155,8 @@
                                 android:layout_centerHorizontal="true"
                                 android:layout_centerVertical="true"
                                 android:contentDescription="sleep"
-                                android:src="@drawable/ic_sleep" />
+                                android:src="@mipmap/ic_sleep"
+                                 />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -212,7 +213,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
                                 android:layout_centerVertical="true"
-                                android:src="@drawable/ic_coffee" />
+                                android:src="@mipmap/ic_coffee"
+                                 />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -317,7 +319,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
                                 android:layout_centerVertical="true"
-                                android:src="@drawable/ic_work" />
+                                android:src="@mipmap/ic_work"
+                                />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -422,7 +425,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
                                 android:layout_centerVertical="true"
-                                android:src="@drawable/ic_home" />
+                                android:src="@mipmap/ic_home" />
                         </RelativeLayout>
                     </LinearLayout>
 

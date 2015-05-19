@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private Context context = this;
     private Measures measures;
     private InputMethodManager imm;
-    //private String userCity = "";
     private boolean autoCompleteTextViewisOpened = false;
     private TooltipWindow tipWindow;
     private CurrentTimeView tv;
@@ -111,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
         loadImagesFromXML(timeZoneDifference, currentHours, selection);
 
 
-        View line = (View) findViewById(R.id.line);
-        line.setTranslationY(getTimeCalculation(currentHours, mClock.getMinutes(), measures.getLeftLinearHeight()));
+        //View line = (View) findViewById(R.id.line);
+        //line.setTranslationY(getTimeCalculation(currentHours, mClock.getMinutes(), measures.getLeftLinearHeight()));
 
     }
 
@@ -391,15 +390,15 @@ public class MainActivity extends AppCompatActivity {
 
         final int version = Build.VERSION.SDK_INT;
         if (version >= 21) {
-            sleepImage = getResources().getDrawable(R.drawable.ic_sleep, getTheme());
-            coffeeImage = getResources().getDrawable(R.drawable.ic_coffee, getTheme());
-            workImage = getResources().getDrawable(R.drawable.ic_work, getTheme());
-            homeImage = getResources().getDrawable(R.drawable.ic_home, getTheme());
+            sleepImage = getResources().getDrawable(R.mipmap.ic_sleep, getTheme());
+            coffeeImage = getResources().getDrawable(R.mipmap.ic_coffee, getTheme());
+            workImage = getResources().getDrawable(R.mipmap.ic_work, getTheme());
+            homeImage = getResources().getDrawable(R.mipmap.ic_home, getTheme());
         } else {
-            sleepImage = getResources().getDrawable(R.drawable.ic_sleep);
-            coffeeImage = getResources().getDrawable(R.drawable.ic_coffee);
-            workImage = getResources().getDrawable(R.drawable.ic_work);
-            homeImage = getResources().getDrawable(R.drawable.ic_home);
+            sleepImage = getResources().getDrawable(R.mipmap.ic_sleep);
+            coffeeImage = getResources().getDrawable(R.mipmap.ic_coffee);
+            workImage = getResources().getDrawable(R.mipmap.ic_work);
+            homeImage = getResources().getDrawable(R.mipmap.ic_home);
         }
 
 
