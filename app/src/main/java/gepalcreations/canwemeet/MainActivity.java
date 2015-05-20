@@ -64,6 +64,24 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+//		Unit Testing for null in table
+
+/*		CityTable mCityTable = new CityTable();
+		String[] cities = mCityTable.tableReturn();
+
+
+		for (int i=0; i<cities.length; i++){
+
+				String test  = DateTimeZone.forID(cities[i]).toString();
+				System.out.println(i+ "== " + test);
+
+		}*/
+		// Continue with code
+
+
+
+
+
 
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
