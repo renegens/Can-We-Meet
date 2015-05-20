@@ -22,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -118,9 +117,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tooltip(View anchor) {
-        tipWindow = new TooltipWindow(this);
-        if (!tipWindow.isTooltipShown())
-            tipWindow.showToolTip(tv.getV(), tv.getTime(), measures.getPadding());
+        //Enable for next version
+        //tipWindow = new TooltipWindow(this);
+        //if (!tipWindow.isTooltipShown())
+            //   tipWindow.showToolTip(tv.getV(), tv.getTime(), measures.getPadding());
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+
     }
 
     @Override
@@ -321,6 +326,7 @@ public class MainActivity extends AppCompatActivity {
         // checking and correcting for negative value
         if (timeZone < 0) {
             timeZone = 24 - (timeZone * (-1));
+            boolean flag = true; //True when timezone was negative
 
         }
         LinearLayout.LayoutParams firstMorningRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
@@ -469,12 +475,32 @@ public class MainActivity extends AppCompatActivity {
 
                 //Set text color for current hour of right side
                 holder.hour.setText(String.valueOf(indexes[i]));
-                
-                if (indexes[i] == (ct+timeZone)%25+1) {
-                    holder.hour.setTypeface(null, Typeface.BOLD);
-                    holder.hour.setTextColor(Color.YELLOW);
+
+                //Check the time to correct for 0
+                if (ct==0) ct=ct+24;
+
+                //Log.i("ct", String.valueOf(ct));
+                //Log.i("timezone", String.valueOf(timeZone));
+                if (timeZone != 0 && indexes[i] == (ct+timeZone)%25+1) {
+                        holder.hour.setTypeface(null, Typeface.BOLD);
+                        holder.hour.setTextColor(Color.YELLOW);
+                    //Log.i("i for not 0", String.valueOf(i));
+
+                    //Log.i("ct for not 0", String.valueOf(ct));
+                    //Log.i("math for not 0", String.valueOf((ct+timeZone)%25+1));
 
                 }
+                //This is when timezone is same
+                if (timeZone == 0 && indexes[i] == ct) {
+
+                        holder.hour.setTypeface(null, Typeface.BOLD);
+                        holder.hour.setTextColor(Color.YELLOW);
+                    //Log.i("i", String.valueOf(i));
+                    //Log.i("timezone", String.valueOf(timeZone));
+
+                    //Log.i("math", String.valueOf((ct + timeZone) % 25));
+                    }
+
                 holder.hour.measure(widthMeasureSpec, heightMeasureSpec);
 
                 if (indexes[i] >= 1 && indexes[i] <= 7) {
@@ -779,7 +805,7 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();  // Always call the superclass method first
 
-        finish();
+       finish();
     }
 
     @Override
