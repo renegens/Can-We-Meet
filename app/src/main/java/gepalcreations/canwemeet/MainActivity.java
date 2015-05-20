@@ -481,7 +481,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //Log.i("ct", String.valueOf(ct));
                 //Log.i("timezone", String.valueOf(timeZone));
-                if (timeZone != 0 && indexes[i] == (ct+timeZone)%25+1) {
+                if (timeZone != 0 && indexes[i] == (ct+timeZone)%25) {
                         holder.hour.setTypeface(null, Typeface.BOLD);
                         holder.hour.setTextColor(Color.YELLOW);
                     //Log.i("i for not 0", String.valueOf(i));
