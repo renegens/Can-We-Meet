@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
 
@@ -465,8 +467,10 @@ public class MainActivity extends AppCompatActivity {
 
                 holder.hour = (TextView) v.findViewById(R.id.hours);
 
+                //Set text color for current hour of right side
                 holder.hour.setText(String.valueOf(indexes[i]));
-                if (indexes[i] == (ct + timeZone)) {
+                
+                if (indexes[i] == (ct+timeZone)%25+1) {
                     holder.hour.setTypeface(null, Typeface.BOLD);
                     holder.hour.setTextColor(Color.YELLOW);
 
