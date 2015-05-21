@@ -332,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
         //Log.i("Difference", String.valueOf(timeZoneDifference));
         //Log.i("Date time from yoda", String.valueOf(dateTime));
         //Log.i("Date time zone for id", String.valueOf(dtLondon));
+		Log.i ("Time Difference", String.valueOf(dtLondon.getHourOfDay() - dateTime.getHourOfDay()));
 
         return dtLondon.getHourOfDay() - dateTime.getHourOfDay();
     }
@@ -341,10 +342,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void loadImagesFromXML(int timeZone, int ct, String selection) {
+		int flag = 1; //True when timezone is positive
         // checking and correcting for negative value
         if (timeZone < 0) {
-            timeZone = 24 - (timeZone * (-1));
-            boolean flag = true; //True when timezone was negative
+            timeZone = 24 - ((timeZone * (-1)));
+			flag = -1;
+
 
         }
         LinearLayout.LayoutParams firstMorningRelativeParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0.0f);
@@ -499,7 +502,18 @@ public class MainActivity extends AppCompatActivity {
 
                 //Log.i("ct", String.valueOf(ct));
                 //Log.i("timezone", String.valueOf(timeZone));
-                if (timeZone != 0 && indexes[i] == (ct+timeZone)%25) {
+				//When time is negative this will work
+				if (flag==1 && timeZone != 0 && indexes[i] == (ct+timeZone)%25 ) {
+					holder.hour.setTypeface(null, Typeface.BOLD);
+					holder.hour.setTextColor(Color.YELLOW);
+					//Log.i("i for not 0", String.valueOf(i));
+
+					//Log.i("ct for not 0", String.valueOf(ct));
+					//Log.i("math for not 0", String.valueOf((ct+timeZone)%25+1));
+
+				}
+				//When time is forward this works
+                if (flag==-1 && timeZone != 0 && indexes[i] == (ct+timeZone)%25 +1 ) {
                         holder.hour.setTypeface(null, Typeface.BOLD);
                         holder.hour.setTextColor(Color.YELLOW);
                     //Log.i("i for not 0", String.valueOf(i));
@@ -787,17 +801,17 @@ public class MainActivity extends AppCompatActivity {
 
 
             t.setPadding(0, (int) Math.ceil(padding), dpToPx(10), (int) Math.ceil(padding));
-        }
-        measures.setPadding((int) Math.ceil(padding));
+		}
+		measures.setPadding((int) Math.ceil(padding));
 
         LinearLayout leftLinear = (LinearLayout) findViewById(R.id.left_layout);
 
-        leftLinear.measure(leftLinear.getWidth(), leftLinear.getHeight());
+		leftLinear.measure(leftLinear.getWidth(), leftLinear.getHeight());
 
-        measures.setLeftLinearHeight(leftLinear.getMeasuredHeight());
+		measures.setLeftLinearHeight(leftLinear.getMeasuredHeight());
 
-        Log.i("Linear Height", String.valueOf(leftLinear.getMeasuredHeight()));
-        Log.i("Difference", String.valueOf(Math.abs(activityHeight - leftLinear.getMeasuredHeight())));
+        //Log.i("Linear Height", String.valueOf(leftLinear.getMeasuredHeight()));
+        //Log.i("Difference", String.valueOf(Math.abs(activityHeight - leftLinear.getMeasuredHeight())));
 
     }
 
