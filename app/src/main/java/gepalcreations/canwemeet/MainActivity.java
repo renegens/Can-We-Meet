@@ -842,9 +842,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (tipWindow != null && tipWindow.isTooltipShown())
-            tipWindow.dismissTooltip();
+        //if (tipWindow != null && tipWindow.isTooltipShown())
+         //   tipWindow.dismissTooltip();
         super.onDestroy();
+		finish();
     }
 
     private class ViewHolder {
