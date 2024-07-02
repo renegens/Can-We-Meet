@@ -32,12 +32,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -99,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         //int currentMinutes = mClock.getMinutes();
         int currentHours = mClock.getHours();
 
-        DateTimeZone dtz = DateTimeZone.getDefault();
+        TimeZone dtz = TimeZone.getDefault();
         //String selection = dtz.getID();
 
         // Get the app's shared preferences
@@ -319,24 +324,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int timeCalculator(String selection) {
-        // get current moment in default time zone
-        DateTime dt = new DateTime();
-        // translate to local time
-
-        DateTime dtLondon = dt.withZone(DateTimeZone.forID(selection));
-
-        java.util.Date date = new java.util.Date(System.currentTimeMillis());
-        DateTimeZone dtz = DateTimeZone.getDefault();// Gets the default time zone.
-        DateTime dateTime = new DateTime(date.getTime(), dtz);
-
-        //Log.i("Difference", String.valueOf(timeZoneDifference));
-        //Log.i("Date time from yoda", String.valueOf(dateTime));
-        //Log.i("Date time zone for id", String.valueOf(dtLondon));
-		Log.i ("Time Difference", String.valueOf(dtLondon.getHourOfDay() - dateTime.getHourOfDay()));
-
-        return dtLondon.getHourOfDay() - dateTime.getHourOfDay();
+        ZonedDateTime defaultZonedDateTime = ZonedDateTime.now();
+        ZonedDateTime targetZonedDateTime = ZonedDateTime.now(ZoneId.of(selection));
+        return targetZonedDateTime.getHour() - defaultZonedDateTime.getHour();
     }
-
 
     ViewHolder holder;
 
