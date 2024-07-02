@@ -1,4 +1,4 @@
-package gepalcreations.canwemeet;
+package eu.giant.canwemeet;
 
 import android.content.Context;
 import android.util.Log;

@@ -1,6 +1,4 @@
-package gepalcreations.canwemeet;
-
-import android.app.Application;
+package giant.canwemeet;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>

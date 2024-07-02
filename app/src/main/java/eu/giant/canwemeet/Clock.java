@@ -1,4 +1,4 @@
-package gepalcreations.canwemeet;
+package eu.giant.canwemeet;
 
 import java.util.Calendar;
 import java.util.TimeZone;

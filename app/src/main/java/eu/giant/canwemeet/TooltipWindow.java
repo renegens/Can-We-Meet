@@ -1,4 +1,4 @@
-package gepalcreations.canwemeet;
+package eu.giant.canwemeet;
 
 import android.app.ActionBar.LayoutParams;
 import android.content.Context;
@@ -6,13 +6,12 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
 
 public class TooltipWindow {
 

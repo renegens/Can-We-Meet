@@ -1,4 +1,4 @@
-package gepalcreations.canwemeet;
+package eu.giant.canwemeet;
 
 
 import android.content.Context;
@@ -32,15 +32,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 

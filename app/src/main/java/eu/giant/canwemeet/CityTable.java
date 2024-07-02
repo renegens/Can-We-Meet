@@ -1,4 +1,4 @@
-package gepalcreations.canwemeet;
+package eu.giant.canwemeet;
 
 public class CityTable {
 
