@@ -2,11 +2,13 @@ package eu.giant.canwemeet;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
+
             setSupportActionBar(toolbar);
         }
 
@@ -313,6 +316,9 @@ public class MainActivity extends AppCompatActivity {
                 });
                 return true;
 
+            case R.id.menu_privacy:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.giant-solutions.eu/can-we-meet"));
+                startActivity(browserIntent);
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-	  xmlns:yourapp="http://schemas.android.com/apk/res-auto"
-	  xmlns:app="http://schemas.android.com/tools">
+	  xmlns:yourapp="http://schemas.android.com/apk/res-auto">
 	<!-- Search, should appear as action button -->
 	<item android:id="@+id/menu_search"
 		  android:icon="@drawable/ic_search"
 		  android:title="@string/search_hint"
 		  yourapp:showAsAction="always"
 		  />
+
+	<item android:id="@+id/menu_privacy"
+		android:icon="@drawable/ic_privacy"
+		android:title="@string/privacy_policy"
+		yourapp:showAsAction="ifRoom"
+		/>
 
 
 </menu>
