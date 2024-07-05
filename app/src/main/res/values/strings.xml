@@ -5,6 +5,7 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="capture">Capture</string>
     <string name="no_results">No Results</string>
-	<string name="preference_file_key">usercity</string>
+    <string name="preference_file_key">usercity</string>
     <string name="text_hint">Search City</string>
+    <string name="title_activity_main_compose">MainComposeActivity</string>
 </resources>
