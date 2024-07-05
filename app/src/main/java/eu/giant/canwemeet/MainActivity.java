@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.menu_privacy:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.giant-solutions.eu/can-we-meet"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.giant-solutions.eu/can-we-meet/index.html"));
                 startActivity(browserIntent);
             default:
                 return super.onOptionsItemSelected(item);

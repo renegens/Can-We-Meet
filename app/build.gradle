@@ -8,7 +8,7 @@ android {
         applicationId "eu.giant.canwemeet"
         minSdkVersion 27
         targetSdkVersion 35
-        versionCode 9
+        versionCode 10
         versionName "0.8"
     }
     buildTypes {
