@@ -10,7 +10,7 @@ import eu.giant.canwemeet.presentation.ui.theme.CanWeMeetTheme
 class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         setContent {
             CanWeMeetTheme {
                 MainScreen()
