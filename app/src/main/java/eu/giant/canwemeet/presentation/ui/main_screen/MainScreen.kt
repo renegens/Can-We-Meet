@@ -29,19 +29,19 @@ import eu.giant.canwemeet.data.Hour
 import eu.giant.canwemeet.data.Section
 import eu.giant.canwemeet.data.Type
 import eu.giant.canwemeet.presentation.ui.main_screen.components.TopBar
-import kotlin.math.absoluteValue
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
 
     val dayGenerator = DayGenerator()
-    val timeDifference  = 4
+    val timeDifference  = 1
     val hours = dayGenerator.homeHours
     val sections = dayGenerator.homeSections
 
-    val otherHours = dayGenerator.calculateTargetHours(timeDifference)
-    val otherSections = dayGenerator.removeDuplicate()
+    val targets = dayGenerator.calculateTargets(timeDifference)
+    //val targetHours = dayGenerator.targetHours
+    //val targetSections = dayGenerator.targetSections
 
     val currentTimeHere = 12
     val currentTimeThere = 15
@@ -66,11 +66,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
                             sections = sections
                         )
                         Day(
-                            hours = otherHours,
+                            hours = targets.hours,
                             rowHeight = rowHeight,
                             isHere = false,
                             currentHour = currentTimeThere,
-                            sections = otherSections,
+                            sections = targets.sections,
                         )
                     }
                 }

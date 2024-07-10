@@ -8,25 +8,6 @@ import kotlin.math.absoluteValue
 
 class DayGenerator {
 
-//    val homeHours = listOf<Hour>(
-//        Hour(hour = 1, Item.Row, Red300),
-//        Hour(hour = 2, Item.Row, Red300),
-//        Hour(hour = 3, Item.Box, Red300),
-//        Hour(hour = 6, Item.Row, Red300),
-//        Hour(hour = 7, Item.Row, Red300),
-//        Hour(hour = 8, Item.Box, Brown200),
-//        Hour(hour = 11, Item.Row, Teal200),
-//        Hour(hour = 12, Item.Row, Teal200),
-//        Hour(hour = 13, Item.Box, Teal200),
-//        Hour(hour = 16, Item.Row, Teal200),
-//        Hour(hour = 17, Item.Row, BlueGrey300),
-//        Hour(hour = 18, Item.Row, BlueGrey300),
-//        Hour(hour = 19, Item.Row, BlueGrey300),
-//        Hour(hour = 20, Item.Box, BlueGrey300),
-//        Hour(hour = 23, Item.Row, BlueGrey300),
-//        Hour(hour = 24, Item.Row, BlueGrey300),
-//    )
-
     val homeHours = listOf<Hour>(
         Hour(hour = 1, Type.Sleep, Red300),
         Hour(hour = 2, Type.Sleep, Red300),
@@ -61,65 +42,67 @@ class DayGenerator {
         Section(type = Type.Home, count = 8),
     )
 
-
-    var targetSections = mutableListOf<Section>()
-
-    fun removeDuplicate(): List<Section> {
-
-        val isFirstBigger = targetSections.first().count > targetSections.last().count
-
-        if (isFirstBigger) {
-            targetSections.last().type = Type.Hidden
-        } else {
-            targetSections.first().type = Type.Hidden
+    private fun List<Section>.removeDuplicate() {
+        if (first().type != last().type) {
+            return
         }
 
-        return targetSections
+        val isFirstBigger = first().count > last().count
 
+        if (isFirstBigger) {
+            last().type = Type.Hidden
+        } else {
+            first().type = Type.Hidden
+        }
     }
 
-
-    fun calculateTargetHours(timeDifference: Int): List<Hour> {
+    fun calculateTargets(timeDifference: Int): Target {
         if (timeDifference == 0) {
-            return homeHours
+            return Target(
+                hours = homeHours,
+                sections = homeSections
+            )
         }
 
         if (timeDifference > 0) {
-            val itemsToMove = homeHours.subList(0, timeDifference)
-            val firstThreeCopy = itemsToMove.toList() // Copy to avoid concurrent modification
-            val otherHours = homeHours.toMutableList()
-            otherHours.removeAll(itemsToMove)
+            val itemsToMove = homeHours.slice(0..timeDifference).toList()
+            val allItems = homeHours.toMutableList()
+            allItems.removeAll(itemsToMove)
 
-            val boxes = otherHours.groupBy { it.type }
-            val boxesCount = mutableListOf<Section>()
-            boxes.forEach {
-                boxesCount.add(Section(it.key, it.value.count()))
+            val sections = mutableListOf<Section>()
+            allItems.groupBy { it.type }.forEach {
+                sections.add(Section(it.key, it.value.count()))
             }
-            boxesCount.add(Section(firstThreeCopy.first().type, firstThreeCopy.count()))
-            targetSections = boxesCount
-            otherHours.addAll(firstThreeCopy)
+            itemsToMove.groupBy { it.type }.forEach {
+                sections.add(Section(it.key, it.value.count()))
+            }
 
-            return otherHours
+            sections.removeDuplicate()
+            allItems.addAll(itemsToMove)
+
+            return Target(
+                hours = allItems,
+                sections = sections
+            )
         } else {
             val startIndex = 24 - timeDifference.absoluteValue
 
             val itemsToMove = homeHours.slice(startIndex..23)
             val remainingItems = homeHours.slice(0..<startIndex)
-            val lastItems = itemsToMove.toList() // Copy to avoid concurrent modification
-            val newList = mutableListOf<Hour>()
+            val sections = mutableListOf<Section>()
 
-            val boxes = remainingItems.groupBy { it.type }
-            val boxesCount = mutableListOf<Section>()
-            boxesCount.add(Section(itemsToMove.first().type, itemsToMove.count()))
-            boxes.forEach {
-                boxesCount.add(Section(it.key, it.value.count()))
+            itemsToMove.groupBy { it.type }.forEach {
+                sections.add(Section(it.key, it.value.count()))
             }
-            targetSections = boxesCount
+            remainingItems.groupBy { it.type }.forEach {
+                sections.add(Section(it.key, it.value.count()))
+            }
+            sections.removeDuplicate()
 
-            newList.addAll(lastItems)
-            newList.addAll(remainingItems)
-            return newList
+            return Target(
+                hours = (itemsToMove + remainingItems).toMutableList(),
+                sections = sections
+            )
         }
-
     }
 }
